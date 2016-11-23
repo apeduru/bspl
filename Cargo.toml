@@ -1,0 +1,7 @@
+[package]
+name = "bspl"
+version = "0.1.0"
+authors = ["Ansley Peduru <ansleypeduru96@gmail.com>"]
+
+[dependencies]
+rustyline = "1.0.0"
