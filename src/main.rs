@@ -7,46 +7,47 @@ use rustyline::Editor;
 
 const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
-fn help_menu(){
-
-}
-
-fn prelude(){
+fn prelude() {
     println!("bspl {}", VERSION);
     println!("Bit-Shift-Print Loop");
     println!("Type 'help', or 'license' for more information.");
 }
 
-fn main(){
+fn repl() {
     let mut repl = Editor::<()>::new();
     // TODO: create a tempfile to conserve history
     if let Err(_) = repl.load_history("history.txt") {
         // TODO: Probably won't need this guard clause after we create tempfile
         // println!("No previous history.");
     }
-    prelude();
+
     loop {
         let readline = repl.readline("# ");
         match readline {
             Ok(line) => {
                 repl.add_history_entry(&line);
                 // TODO: function(s) to parse and compute bit shift operations
-                // TODO: Help menu
+                // TODO: Help menmu
                 // TODO: License
                 println!("{}", line);
-            },
+            }
+            Err(ReadlineError::Eof) => break,
             Err(ReadlineError::Interrupted) => {
+                license::print_license();
                 println!("KeyboardInterrupt");
-            },
-            Err(ReadlineError::Eof) => {
-                break
-            },
+            }
             Err(err) => {
                 println!("Error: {:?}", err);
-                break
+                break;
             }
         }
     }
     // TODO: Cleanup, delete history tempfile
-    repl.save_history("history.txt").unwrap();
+    repl.save_history("history.txt")
+        .unwrap();
+}
+
+fn main() {
+    prelude();
+    repl();
 }
