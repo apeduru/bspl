@@ -1,4 +1,6 @@
-const LICENSE: &'static str = r#"MIT License
+
+pub const LICENSE: &'static str = r#"
+MIT License
 
 Copyright (c) 2016 Ansley Peduru
 
@@ -18,10 +20,8 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-"#;
+SOFTWARE."#;
 
+pub const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
-pub fn print_license() {
-    println!("{}", LICENSE);
-}
+pub const HELP: &'static str = r#""#;
