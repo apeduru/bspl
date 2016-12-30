@@ -9,6 +9,8 @@ use constants::KEYWORDS;
 //     }
 // }
 
+pub type Variables = HashMap<String, String>;
+pub type Operators = HashMap<&'static str, Operator>;
 
 // Refs: stackoverflow.com/questions/930486/what-is-associativity-of-operators-and-why-is-it-important
 pub enum Associativity {
@@ -36,14 +38,15 @@ impl Operator {
 }
 
 pub struct Parser {
-    operators: HashMap<&'static str, Operator>, // output: TokenList,
+    operators: Operators, // output: TokenList,
+    variables: Variables,
 }
 
 impl Parser {
     pub fn new() -> Parser {
         Parser {
-            operators: HashMap::new(),
-            // output: TokenList,
+            operators: Operators::new(),
+            variables: Variables::new(), // output: TokenList,
         }
     }
 
