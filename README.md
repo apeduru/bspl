@@ -15,12 +15,24 @@ anyone that is interested in learning binary level manipulations.
 
 [awesome-bits](https://github.com/keonkim/awesome-bits)
 
+[](http://ecomputernotes.com/what-is-c/operator/c-bitwise-operators)
+
+[Precedence](http://introcs.cs.princeton.edu/java/11precedence/)
+
+[Shunting Yard Algorithm Python Implementation](http://rosettacode.org/wiki/Parsing/Shunting-yard_algorithm#Python)
+
 ## TODO
 
 Learn how parsers work
 
-Support for memory addressing (difference between addresses, show value in decimal and hex)
+Support for memory addressing
 
 Base Conversions: define a standard method e.g. 16:10 AF (Convert hexadecimal value to decimal)
 
 Operators: + - * / & | ~
+
+Explain why this offers a richer experience compared to the Python REPL.
+
+Add Octal to supported bases
+
+Support for equality: ==
