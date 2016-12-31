@@ -21,6 +21,8 @@ anyone that is interested in learning binary level manipulations.
 
 [Shunting Yard Algorithm Python Implementation](http://rosettacode.org/wiki/Parsing/Shunting-yard_algorithm#Python)
 
+[An Overview of Lexers and Parsers](http://savage.net.au/Ron/html/graphviz2.marpa/Lexing.and.Parsing.Overview.html#My_Rules-of-Thumb_for_Writing_Lexers%2FParsers)
+
 ## TODO
 
 Learn how parsers work
