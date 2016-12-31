@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 #[derive(Debug, PartialEq)]
 pub enum Token {
     OpenBracket,
@@ -14,7 +12,7 @@ pub enum Token {
     Binary(String),
     // Literal expression: 0x2a
     Hexadecimal(String),
-    Radix(String),
+    Radix(String), // TEMP: Remove when done classifying Hex, Bin, Dec, Var
     Operator(char),
     Assignment(char),
     Unknown(char),
@@ -28,18 +26,8 @@ enum State {
     Front,
     Open,
     Close,
-    // >> <<
-    // DoubleOperator,
-    // ^ | & ~ ) (
-    // SingleOperator,
     Operator,
-    // =
     Assignment,
-    // Precedes an assignment
-    // Variable,
-    // Follows an assignment
-    // Expression,
-    // Hex, Bin, Dec
     Radix,
 }
 
@@ -62,76 +50,77 @@ impl Lexer {
         self.reset_lexer();
 
         let mut radix = String::with_capacity(2);
+        let mut start_position: usize = 0;
         for (position, character) in line.trim().chars().enumerate() {
             if character.is_whitespace() {
                 continue;
             }
 
-            println!("{}", character);
             let mut token = Token::Skip;
             match character {
                 ')' => {
-                    self.radix_check(position, &mut radix);
+                    self.radix_check(start_position, &mut radix);
                     token = Token::CloseBracket;
+                    start_position = position;
                     self.state = State::Close;
                 }
                 '(' => {
-                    self.radix_check(position, &mut radix);
+                    self.radix_check(start_position, &mut radix);
                     token = Token::OpenBracket;
+                    start_position = position;
                     self.state = State::Open;
                 }
-                '^' | '&' | '|' | '~' => {
-                    self.radix_check(position, &mut radix);
+                '>' | '<' | '^' | '&' | '|' | '~' => {
+                    self.radix_check(start_position, &mut radix);
                     token = Token::Operator(character);
-                    self.state = State::Operator;
-                }
-                '>' | '<' => {
-                    self.radix_check(position, &mut radix);
-                    token = Token::Operator(character);
+                    start_position = position;
                     self.state = State::Operator;
                 }
                 '=' => {
-                    self.radix_check(position, &mut radix);
+                    self.radix_check(start_position, &mut radix);
                     token = Token::Assignment(character);
+                    start_position = position;
                     self.state = State::Assignment;
                 }
                 _ if character.is_alphabetic() || character.is_numeric() => {
+                    if radix.is_empty() {
+                        start_position = position;
+                    }
                     radix.push(character);
                     self.state = State::Radix;
                 }
                 _ => {
-                    self.radix_check(position, &mut radix);
+                    self.radix_check(start_position, &mut radix);
                     token = Token::Unknown(character);
+                    start_position = position;
                     self.state = State::General;
                 }
             }
-
             if token != Token::Skip {
-                self.tokens.push((position, token));
+                self.tokens.push((start_position, token));
             }
         }
         if !radix.is_empty() {
-            let mut token = Token::Radix(radix.clone());
-            self.tokens.push((line.len() - radix.len(), token));
+            self.tokens.push((start_position, Token::Radix(radix.clone())));
         }
 
         &self.tokens
     }
 
-    fn radix_check(&mut self, position: usize, radix: &mut String) {
+    fn radix_check(&mut self, start_position: usize, radix: &mut String) {
         if self.state == State::Radix {
-            let mut token = Token::Radix(radix.clone());
-            self.tokens.push((position - radix.len(), token));
+            self.tokens.push((start_position, Token::Radix(radix.clone())));
             radix.clear();
         }
 
     }
-    // TODO: Merge this with radix_check
-    fn is_valid_number(&mut self, expression: &String) -> (bool, Token) {
-        let mut token = Token::Skip;
-        // Must be valid Binary, Hex, or Dec
-        (false, token)
-    }
+
+    // // TODO: Merge this with radix_check
+    // fn is_valid_number(&mut self, expression: &String) -> (bool, Token) {
+    //     let token = Token::Skip;
+    //     // Must be valid Binary, Hex, or Dec
+    //     (false, token)
+    // }
 
     fn reset_lexer(&mut self) {
         self.state = State::Front;

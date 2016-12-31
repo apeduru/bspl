@@ -38,7 +38,7 @@ fn repl() {
         match repl.readline("=> ") {
             Ok(line) => {
                 repl.add_history_entry(&line);
-                let mut tokens = lexer.analyze(&line);
+                let tokens = lexer.analyze(&line);
                 for t in tokens.iter() {
                     println!("{:?}", t);
 
@@ -63,7 +63,6 @@ fn repl() {
         }
         repl.save_history(tmp_file.path()).unwrap();
     }
-    // tmp_file.close();
 }
 
 pub fn main() {
