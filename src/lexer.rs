@@ -2,17 +2,16 @@
 pub enum Token {
     OpenBracket,
     CloseBracket,
-    // Variable, must strictly be alphabetical
-    Variable(String),
-    // Expression, must appear after '='
-    Expression(String),
+    // Identifier, must strictly be alphabetical
+    Identifier(String),
     // Literal expression: 42
     Decimal(String),
     // Literal expression: 0b101010
     Binary(String),
     // Literal expression: 0x2a
     Hexadecimal(String),
-    Radix(String), // TEMP: Remove when done classifying Hex, Bin, Dec, Var
+    // Invalid Radix
+    Radix(String),
     Operator(char),
     Assignment(char),
     Unknown(char),
@@ -24,17 +23,16 @@ pub enum Token {
 enum State {
     General,
     Front,
-    Open,
-    Close,
     Operator,
     Assignment,
+    Identifier,
     Radix,
 }
 
 pub type Tokens = Vec<(usize, Token)>;
 
 pub struct Lexer {
-    pub tokens: Tokens,
+    tokens: Tokens,
     state: State,
 }
 
@@ -62,13 +60,13 @@ impl Lexer {
                     self.radix_check(start_position, &mut radix);
                     token = Token::CloseBracket;
                     start_position = position;
-                    self.state = State::Close;
+                    self.state = State::General;
                 }
                 '(' => {
                     self.radix_check(start_position, &mut radix);
                     token = Token::OpenBracket;
                     start_position = position;
-                    self.state = State::Open;
+                    self.state = State::Front;
                 }
                 '>' | '<' | '^' | '&' | '|' | '~' => {
                     self.radix_check(start_position, &mut radix);
@@ -82,7 +80,18 @@ impl Lexer {
                     start_position = position;
                     self.state = State::Assignment;
                 }
-                _ if character.is_alphabetic() || character.is_numeric() => {
+                _ if character.is_alphabetic() => {
+                    if radix.is_empty() {
+                        start_position = position;
+                    }
+                    radix.push(character);
+                    if self.state != State::Radix {
+                        self.state = State::Identifier;
+                    }
+
+                }
+                // Any Radix is gauranteed to have at least 1 numeric character
+                _ if character.is_numeric() => {
                     if radix.is_empty() {
                         start_position = position;
                     }
@@ -100,27 +109,39 @@ impl Lexer {
                 self.tokens.push((start_position, token));
             }
         }
+        // Radix may occur at the end
         if !radix.is_empty() {
-            self.tokens.push((start_position, Token::Radix(radix.clone())));
+            let mut token = self.identify_radix(&mut radix);
+            self.tokens.push((start_position, token));
         }
 
         &self.tokens
     }
 
-    fn radix_check(&mut self, start_position: usize, radix: &mut String) {
+    fn identify_radix(&mut self, radix: &mut String) -> Token {
+        let mut token;
         if self.state == State::Radix {
-            self.tokens.push((start_position, Token::Radix(radix.clone())));
-            radix.clear();
+            if radix.len() > 2 && radix.starts_with("0x") {
+                token = Token::Hexadecimal(radix.clone());
+            } else if radix.len() > 2 && radix.starts_with("0b") {
+                token = Token::Binary(radix.clone());
+            } else if !radix.starts_with("0b") && !radix.starts_with("0x") {
+                token = Token::Decimal(radix.clone());
+            } else {
+                token = Token::Radix(radix.clone());
+            }
+        } else {
+            token = Token::Identifier(radix.clone());
         }
 
+        token
     }
 
-    // // TODO: Merge this with radix_check
-    // fn is_valid_number(&mut self, expression: &String) -> (bool, Token) {
-    //     let token = Token::Skip;
-    //     // Must be valid Binary, Hex, or Dec
-    //     (false, token)
-    // }
+    fn radix_check(&mut self, start_position: usize, radix: &mut String) {
+        let mut token = self.identify_radix(radix);
+        self.tokens.push((start_position, token));
+        radix.clear();
+    }
 
     fn reset_lexer(&mut self) {
         self.state = State::Front;
