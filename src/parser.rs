@@ -1,16 +1,9 @@
 use std::collections::HashMap;
 use lexer::Tokens;
 use error::ParsingError;
-// use constants::KEYWORDS;
 
-// for keyword in KEYWORDS {
-//     if keyword.to_string() == variable.to_lowercase() {
-//         return Err(LexerError::KeywordError(variable));
-//     }
-// }
-
-pub type Variables = HashMap<String, String>;
 pub type Operators = HashMap<&'static str, Operator>;
+pub type LookupTable = HashMap<String, String>;
 
 // Refs: stackoverflow.com/questions/930486/what-is-associativity-of-operators-and-why-is-it-important
 pub enum Associativity {
@@ -38,14 +31,15 @@ impl Operator {
 }
 
 pub struct Parser {
-    operators: Operators, /* output: TokenList,
-                           * variables: Variables, */
+    operators: Operators,
+    lookup_table: LookupTable,
 }
 
 impl Parser {
     pub fn new() -> Parser {
         Parser {
-            operators: Operators::new(), // variables: Variables::new(), // output: TokenList,
+            operators: Operators::new(),
+            lookup_table: LookupTable::new(),
         }
     }
 
@@ -61,6 +55,15 @@ impl Parser {
         self.operators.insert("|", Operator::new(7, Associativity::LeftToRight));
         self.operators.insert("=", Operator::new(8, Associativity::RightToLeft));
     }
+
+    // fn is_keyword(&mut self, err_position: usize, radix: &String) -> Result<&Tokens> {
+    //     for keyword in KEYWORDS {
+    //         if keyword.to_string() == radix.to_lowercase() {
+    //             return Err(LexerError::KeywordError(err_position));
+    //         }
+    //     }
+    //     Ok((&self.tokens))
+    // }
 
     pub fn parse(&mut self, tokens: Tokens) -> Result<Tokens, ParsingError> {
         // let mut operator_stack = Tokens::with_capacity(10);
