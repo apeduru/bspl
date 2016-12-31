@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use lexer::Tokens;
 use error::ParsingError;
-use constants::KEYWORDS;
+// use constants::KEYWORDS;
 
 // for keyword in KEYWORDS {
 //     if keyword.to_string() == variable.to_lowercase() {
@@ -38,15 +38,14 @@ impl Operator {
 }
 
 pub struct Parser {
-    operators: Operators, // output: TokenList,
-    variables: Variables,
+    operators: Operators, /* output: TokenList,
+                           * variables: Variables, */
 }
 
 impl Parser {
     pub fn new() -> Parser {
         Parser {
-            operators: Operators::new(),
-            variables: Variables::new(), // output: TokenList,
+            operators: Operators::new(), // variables: Variables::new(), // output: TokenList,
         }
     }
 
@@ -64,7 +63,7 @@ impl Parser {
     }
 
     pub fn parse(&mut self, tokens: Tokens) -> Result<Tokens, ParsingError> {
-        let mut operator_stack = Tokens::with_capacity(10);
+        // let mut operator_stack = Tokens::with_capacity(10);
         Ok((tokens))
     }
 }
