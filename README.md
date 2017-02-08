@@ -7,6 +7,21 @@ Bit-Shift-Print Loop
 for practising bit-wise operations. Aimed at undergraduates in CS/SE/ECE or
 anyone that is interested in learning binary level manipulations.
 
+## Design
+
+`bspl` is split into three phases: the lexer, parser, and evaluator.
+
+The lexer is only responsible for creating a token stream from the REPL input.
+It does not concern itself with the semantics of the language. It is only interested
+in understanding the syntax and classifying the scanned tokens.
+
+To this end, the parser is responsible for pruning and creating a structure out
+of the raw token stream. As a result, the parser contains stricter rules and more
+edge cases to deal with it.  Some of the heavier token analysis work of the parser
+may have been alleviated had these rules been shifted earlier to the lexer.
+utilizes the Shunting Yard Algorithm, the parser will create
+
+
 ## References
 
 [Bit Twiddling Hacks](http://graphics.stanford.edu/~seander/bithacks.html)
@@ -15,7 +30,7 @@ anyone that is interested in learning binary level manipulations.
 
 [awesome-bits](https://github.com/keonkim/awesome-bits)
 
-[](http://ecomputernotes.com/what-is-c/operator/c-bitwise-operators)
+[Rsut Bitwise Operations](https://rosettacode.org/wiki/Bitwise_operations#Rust)
 
 [Precedence](http://introcs.cs.princeton.edu/java/11precedence/)
 
@@ -23,7 +38,7 @@ anyone that is interested in learning binary level manipulations.
 
 [An Overview of Lexers and Parsers](http://savage.net.au/Ron/html/graphviz2.marpa/Lexing.and.Parsing.Overview.html#My_Rules-of-Thumb_for_Writing_Lexers%2FParsers)
 
-## TODO
+## Roadmap
 
 Learn how parsers work
 
