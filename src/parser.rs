@@ -38,15 +38,6 @@ impl Parser {
         }
     }
 
-    // fn is_keyword(&mut self, identifier: String) -> bool {
-    //     for keyword in KEYWORDS {
-    //         if keyword.to_string() == identifier.to_lowercase() {
-    //             return true;
-    //         }
-    //     }
-    //     return false;
-    // }
-
     fn lower_precedence(&self, new_token: &Token, top_token: &Token) -> bool {
         let &Operator(new_token_prec, ref new_token_assoc) = match *new_token {
             Token::Operator(ref name) => self.operators.get::<str>(&name).unwrap(),
@@ -76,6 +67,10 @@ impl Parser {
                     // precedence is less than or equal to that of o2, or o1 is
                     // right associative, and has precedence less than that of
                     // o2, pop o2 off the operator stack, onto the output queue
+                    if !self.operators.contains_key::<str>(&name) {
+                        return Err(ParserError::IllegalOperator(position));
+                    }
+
                     loop {
                         match self.stack.last() {
                             Some(&(_, Token::Operator(_))) => {
@@ -110,8 +105,8 @@ impl Parser {
                         return Err(ParserError::MissingBracket(position));
                     }
                 }
-                Token::Unknown(name) => {
-                    return Err(ParserError::IllegalOperator(position, name));
+                Token::Unknown(_) => {
+                    return Err(ParserError::IllegalOperator(position));
                 }
                 _ => continue,
 
