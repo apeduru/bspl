@@ -9,7 +9,7 @@ use bspl::constants::VERSION;
 use bspl::lexer::Lexer;
 use bspl::parser::Parser;
 use bspl::evaluator::Evaluator;
-// use bspl::error::ParserError;
+use bspl::error::ParserError;
 
 fn prelude() {
     println!("bspl {}", VERSION);
@@ -19,25 +19,36 @@ fn prelude() {
 
 fn repl() {
     let mut repl = Editor::<()>::new();
+    let prompt = "=> ";
     let tmp_file = NamedTempFile::new().unwrap();
     let _ = repl.load_history(tmp_file.path());
+
     let mut lexer = Lexer::new();
     let mut parser = Parser::default();
     // let mut evaluator = Evaluator::new();
 
     loop {
-        match repl.readline("=> ") {
+        match repl.readline(prompt) {
             Ok(line) => {
                 repl.add_history_entry(&line);
-                let mut tokens = lexer.analyze(&line);
-                for t in tokens.iter() {
-                    println!("{:?}", t);
+                match parser.parse(lexer.analyze(&line)) {
+                    Ok(parsed_tokens) => {
+                        println!("{:?}", parsed_tokens);
+                        // let result: String = evaluator.evaluate(parsed_tokens);
+                    }
+                    Err(ParserError::IllegalOperator(position)) => {
+                        println!("{caret:>width$}\n.. Illegal Operator",
+                                 caret = "^",
+                                 width = position + prompt.len() + 1);
+                    }
+                    Err(ParserError::MissingBracket(position)) => {
+                        println!("{caret:>width$}\n.. Missing Bracket",
+                                 caret = "^",
+                                 width = position + prompt.len() + 1);
+                    }
+                    _ => break,
+
                 }
-                let mut parsed_tokens = parser.parse(tokens);
-                for p in parsed_tokens.iter() {
-                    println!("{:?}", p);
-                }
-                // let result: String = evaluator.evaluate(parsed_tokens);
             }
             Err(ReadlineError::Eof) => break,
             Err(ReadlineError::Interrupted) => {
