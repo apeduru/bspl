@@ -1,72 +1,155 @@
 use std::collections::HashMap;
-use lexer::Tokens;
-use error::ParsingError;
+use lexer::{Token, Tokens};
+use error::ParserError;
+use constants::KEYWORDS;
 
-pub type Operators = HashMap<&'static str, Operator>;
-pub type LookupTable = HashMap<String, String>;
+type Operators = HashMap<&'static str, Operator>;
+type Identifiers = HashMap<String, String>;
 
-// Refs: stackoverflow.com/questions/930486/what-is-associativity-of-operators-and-why-is-it-important
-pub enum Associativity {
+#[derive(PartialEq, Debug)]
+enum Associativity {
     LeftToRight,
     RightToLeft,
 }
 
-pub struct Operator(u8, Associativity);
+#[derive(PartialEq, Debug)]
+struct Operator(usize, Associativity);
 
-/// Operator Precedence
-/// | Precedence | Operator | Symbol | Associativity |
-/// |:----------:|:--------:|:------:|---------------|
-/// |1           |Brackets  |()      |Left-to-Right  |
-/// |2           |NOT       |~       |Right-to-Left  |
-/// |3           |Shift     |<< >>   |Left-to-Right  |
-/// |4           |Equality  |==      |Left-to-Right  |
-/// |5           |AND       |&       |Left-to-Right  |
-/// |6           |XOR       |^       |Left-to-Right  |
-/// |7           |OR        ||       |Left-to-Right  |
-/// |8           |Assignment|=       |Right-to-Left  |
 impl Operator {
-    pub fn new(precedence: u8, associativity: Associativity) -> Operator {
+    fn new(precedence: usize, associativity: Associativity) -> Operator {
         Operator(precedence, associativity)
     }
 }
 
 pub struct Parser {
     operators: Operators,
-    lookup_table: LookupTable,
+    identifiers: Identifiers,
+    stack: Tokens,
+    output: Tokens,
 }
 
 impl Parser {
-    pub fn new() -> Parser {
+    fn new() -> Parser {
         Parser {
             operators: Operators::new(),
-            lookup_table: LookupTable::new(),
+            identifiers: Identifiers::new(),
+            stack: Tokens::with_capacity(3),
+            output: Tokens::with_capacity(3),
         }
     }
 
-    pub fn init(&mut self) {
-        self.operators.insert("(", Operator::new(1, Associativity::LeftToRight));
-        self.operators.insert(")", Operator::new(1, Associativity::LeftToRight));
-        self.operators.insert("~", Operator::new(2, Associativity::RightToLeft));
-        self.operators.insert(">>", Operator::new(3, Associativity::LeftToRight));
-        self.operators.insert("<<", Operator::new(3, Associativity::LeftToRight));
-        self.operators.insert("==", Operator::new(4, Associativity::LeftToRight));
-        self.operators.insert("&", Operator::new(5, Associativity::LeftToRight));
-        self.operators.insert("^", Operator::new(6, Associativity::LeftToRight));
-        self.operators.insert("|", Operator::new(7, Associativity::LeftToRight));
-        self.operators.insert("=", Operator::new(8, Associativity::RightToLeft));
-    }
-
-    // fn is_keyword(&mut self, err_position: usize, radix: &String) -> Result<&Tokens> {
+    // fn is_keyword(&mut self, identifier: String) -> bool {
     //     for keyword in KEYWORDS {
-    //         if keyword.to_string() == radix.to_lowercase() {
-    //             return Err(LexerError::KeywordError(err_position));
+    //         if keyword.to_string() == identifier.to_lowercase() {
+    //             return true;
     //         }
     //     }
-    //     Ok((&self.tokens))
+    //     return false;
     // }
 
-    pub fn parse(&mut self, tokens: Tokens) -> Result<Tokens, ParsingError> {
-        // let mut operator_stack = Tokens::with_capacity(10);
-        Ok((tokens))
+    fn lower_precedence(&self, new_token: &Token, top_token: &Token) -> bool {
+        let &Operator(new_token_prec, ref new_token_assoc) = match *new_token {
+            Token::Operator(ref name) => self.operators.get::<str>(&name).unwrap(),
+            _ => unreachable!(),
+        };
+
+        let &Operator(top_token_prec, _) = match *top_token {
+            Token::Operator(ref name) => self.operators.get::<str>(&name).unwrap(),
+            _ => unreachable!(),
+        };
+
+        (*new_token_assoc == Associativity::LeftToRight && new_token_prec <= top_token_prec) ||
+        (*new_token_assoc == Associativity::RightToLeft && new_token_prec < top_token_prec)
+    }
+
+    pub fn parse(&mut self, tokens: &Tokens) -> Result<&Tokens, ParserError> {
+        self.reset_parser();
+
+        let mut iter = tokens.iter().peekable();
+        while let Some(&(position, ref token)) = iter.next() {
+            match *token {
+                Token::Decimal(_) => self.output.push((position, token.clone())),
+                Token::Operator(ref name) => {
+                    // if the token is an operator, o1, then:
+                    // while there is an operator token o2, at the top of the
+                    // operator stack and either o1 is left-associative and its
+                    // precedence is less than or equal to that of o2, or o1 is
+                    // right associative, and has precedence less than that of
+                    // o2, pop o2 off the operator stack, onto the output queue
+                    loop {
+                        match self.stack.last() {
+                            Some(&(_, Token::Operator(_))) => {
+                                if self.lower_precedence(&token, &self.stack.last().unwrap().1) {
+                                    self.output.push(self.stack.pop().unwrap());
+                                } else {
+                                    break;
+                                }
+                            }
+                            _ => break,
+                        }
+                    }
+
+                    self.stack.push((position, token.clone()));
+                }
+                Token::OpenBracket => self.stack.push((position, token.clone())),
+                Token::CloseBracket => {
+                    let mut found = false;
+
+                    loop {
+                        match self.stack.last() {
+                            Some(&(_, Token::OpenBracket)) => {
+                                found = true;
+                                self.stack.pop();
+                                break;
+                            }
+                            None => break,
+                            _ => self.output.push(self.stack.pop().unwrap()),
+                        }
+                    }
+                    if !found {
+                        return Err(ParserError::MissingBracket(position));
+                    }
+                }
+                Token::Unknown(name) => {
+                    return Err(ParserError::IllegalOperator(position, name));
+                }
+                _ => continue,
+
+            }
+        }
+        loop {
+            match self.stack.last() {
+                Some(&(position, Token::OpenBracket)) => {
+                    return Err(ParserError::MissingBracket(position))
+                }
+                Some(_) => self.output.push(self.stack.pop().unwrap()),
+                None => break,
+            }
+        }
+
+        Ok((&self.output))
+    }
+
+    fn reset_parser(&mut self) {
+        self.stack.clear();
+        self.output.clear();
+    }
+}
+
+impl Default for Parser {
+    fn default() -> Parser {
+        let mut parser = Parser::new();
+
+        parser.operators.insert("(", Operator::new(1, Associativity::LeftToRight));
+        parser.operators.insert(")", Operator::new(1, Associativity::LeftToRight));
+        parser.operators.insert("~", Operator::new(2, Associativity::RightToLeft));
+        parser.operators.insert("-", Operator::new(2, Associativity::RightToLeft));
+        parser.operators.insert(">>", Operator::new(3, Associativity::LeftToRight));
+        parser.operators.insert("<<", Operator::new(3, Associativity::LeftToRight));
+        parser.operators.insert("&", Operator::new(4, Associativity::LeftToRight));
+        parser.operators.insert("^", Operator::new(5, Associativity::LeftToRight));
+        parser.operators.insert("|", Operator::new(6, Associativity::LeftToRight));
+
+        parser
     }
 }

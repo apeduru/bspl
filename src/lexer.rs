@@ -1,21 +1,17 @@
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Token {
     OpenBracket,
     CloseBracket,
-    // Identifier, must strictly be alphabetical
-    Identifier(String),
-    // Literal expression: 42
-    Decimal(String),
-    // Literal expression: 0b101010
-    Binary(String),
-    // Literal expression: 0x2a
-    Hexadecimal(String),
-    // Invalid Radix
-    Radix(String),
-    Operator(char),
-    Assignment(char),
+    Identifier(String), // Identifier, must be alphabetical
+    Decimal(String), // Literal expression: 42
+    Binary(String), // Literal expression: 0b101010
+    // Octal(String), // Literal expression: 0o052
+    Hexadecimal(String), // Literal expression: 0x2a
+    Radix(String), // Non-{Bin, Hex, Dec, Oct}
+    Operator(String),
+    // Assignment(String),
     Unknown(char),
-    // Don't care token
+    // Placeholder/Don't care token. Every character is tokenized.
     Skip,
 }
 
@@ -23,8 +19,10 @@ pub enum Token {
 enum State {
     General,
     Front,
+    Bracket,
     Operator,
-    Assignment,
+    Shift,
+    // Assignment,
     Identifier,
     Radix,
 }
@@ -33,14 +31,16 @@ pub type Tokens = Vec<(usize, Token)>;
 
 pub struct Lexer {
     tokens: Tokens,
-    state: State,
+    curr_state: State,
+    prev_state: State,
 }
 
 impl Lexer {
     pub fn new() -> Lexer {
         Lexer {
             tokens: Tokens::with_capacity(10),
-            state: State::Front,
+            curr_state: State::Front,
+            prev_state: State::General,
         }
     }
 
@@ -48,103 +48,111 @@ impl Lexer {
         self.reset_lexer();
 
         let mut radix = String::with_capacity(2);
+        let mut shift = String::with_capacity(2);
         let mut start_position: usize = 0;
+        let mut radix_position: usize = 0;
+        let mut shift_position: usize = 0;
+
         for (position, character) in line.trim().chars().enumerate() {
             if character.is_whitespace() {
                 continue;
             }
 
             let mut token = Token::Skip;
+            self.prev_state = self.curr_state;
             match character {
                 ')' => {
-                    self.radix_check(start_position, &mut radix);
                     token = Token::CloseBracket;
                     start_position = position;
-                    self.state = State::General;
+                    self.curr_state = State::Bracket;
                 }
                 '(' => {
-                    self.radix_check(start_position, &mut radix);
                     token = Token::OpenBracket;
                     start_position = position;
-                    self.state = State::Front;
+                    self.curr_state = State::Bracket;
                 }
-                '>' | '<' | '^' | '&' | '|' | '~' => {
-                    self.radix_check(start_position, &mut radix);
-                    token = Token::Operator(character);
+                '^' | '&' | '|' | '~' | '-' => {
+                    token = Token::Operator(character.to_string());
                     start_position = position;
-                    self.state = State::Operator;
+                    self.curr_state = State::Operator;
                 }
-                '=' => {
-                    self.radix_check(start_position, &mut radix);
-                    token = Token::Assignment(character);
-                    start_position = position;
-                    self.state = State::Assignment;
+                '>' | '<' => {
+                    if shift.is_empty() {
+                        shift_position = position;
+                    }
+                    shift.push(character);
+                    self.curr_state = State::Shift;
                 }
                 _ if character.is_alphabetic() => {
                     if radix.is_empty() {
-                        start_position = position;
+                        radix_position = position;
                     }
                     radix.push(character);
-                    if self.state != State::Radix {
-                        self.state = State::Identifier;
+                    if self.curr_state != State::Radix {
+                        self.curr_state = State::Identifier;
                     }
 
                 }
-                // Any Radix is gauranteed to have at least 1 numeric character
                 _ if character.is_numeric() => {
                     if radix.is_empty() {
-                        start_position = position;
+                        radix_position = position;
                     }
                     radix.push(character);
-                    self.state = State::Radix;
+                    self.curr_state = State::Radix;
                 }
                 _ => {
-                    self.radix_check(start_position, &mut radix);
                     token = Token::Unknown(character);
                     start_position = position;
-                    self.state = State::General;
+                    self.curr_state = State::General;
                 }
             }
-            if token != Token::Skip {
-                self.tokens.push((start_position, token));
+
+            if (self.prev_state == State::Radix && self.curr_state != State::Radix) ||
+               (self.prev_state == State::Identifier && self.curr_state != State::Identifier) {
+                self.identify_radix(radix_position, &mut radix);
             }
+
+            if self.prev_state == State::Shift && self.curr_state != State::Shift {
+                self.tokens.push((shift_position, Token::Operator(shift.clone())));
+                shift.clear();
+            }
+
+            if token != Token::Skip {
+                self.tokens.push((start_position, token.clone()));
+            }
+
+
         }
-        // Radix may occur at the end
+
         if !radix.is_empty() {
-            let mut token = self.identify_radix(&mut radix);
-            self.tokens.push((start_position, token));
+            self.identify_radix(radix_position, &mut radix);
+        }
+
+        if !shift.is_empty() {
+            self.tokens.push((shift_position, Token::Operator(shift.clone())));
+            shift.clear();
         }
 
         &self.tokens
     }
 
-    fn identify_radix(&mut self, radix: &mut String) -> Token {
-        let mut token;
-        if self.state == State::Radix {
-            if radix.len() > 2 && radix.starts_with("0x") {
-                token = Token::Hexadecimal(radix.clone());
-            } else if radix.len() > 2 && radix.starts_with("0b") {
-                token = Token::Binary(radix.clone());
-            } else if !radix.starts_with("0b") && !radix.starts_with("0x") {
-                token = Token::Decimal(radix.clone());
-            } else {
-                token = Token::Radix(radix.clone());
-            }
+    fn identify_radix(&mut self, position: usize, radix: &mut String) {
+        if !radix.parse::<i32>().is_err() {
+            self.tokens.push((position, Token::Decimal(radix.clone())));
         } else {
-            token = Token::Identifier(radix.clone());
+            self.tokens.push((position, Token::Radix(radix.clone())));
         }
-
-        token
-    }
-
-    fn radix_check(&mut self, start_position: usize, radix: &mut String) {
-        let mut token = self.identify_radix(radix);
-        self.tokens.push((start_position, token));
         radix.clear();
     }
 
+
     fn reset_lexer(&mut self) {
-        self.state = State::Front;
+        self.curr_state = State::Front;
+        self.prev_state = State::General;
         self.tokens.clear();
     }
 }
+
+
+// #[cfg(test)]
+// mod tests {}

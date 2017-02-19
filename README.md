@@ -9,18 +9,7 @@ anyone that is interested in learning binary level manipulations.
 
 ## Design
 
-`bspl` is split into three phases: the lexer, parser, and evaluator.
-
-The lexer is only responsible for creating a token stream from the REPL input.
-It does not concern itself with the semantics of the language. It is only interested
-in understanding the syntax and classifying the scanned tokens.
-
-To this end, the parser is responsible for pruning and creating a structure out
-of the raw token stream. As a result, the parser contains stricter rules and more
-edge cases to deal with it.  Some of the heavier token analysis work of the parser
-may have been alleviated had these rules been shifted earlier to the lexer.
-utilizes the Shunting Yard Algorithm, the parser will create
-
+I wrote about the design of this project in DESIGN.md
 
 ## References
 
@@ -37,6 +26,8 @@ utilizes the Shunting Yard Algorithm, the parser will create
 [Shunting Yard Algorithm Python Implementation](http://rosettacode.org/wiki/Parsing/Shunting-yard_algorithm#Python)
 
 [An Overview of Lexers and Parsers](http://savage.net.au/Ron/html/graphviz2.marpa/Lexing.and.Parsing.Overview.html#My_Rules-of-Thumb_for_Writing_Lexers%2FParsers)
+
+[How CPython's Compiler Works](https://www.youtube.com/watch?v=R31NRWgoIWM)
 
 ## Roadmap
 

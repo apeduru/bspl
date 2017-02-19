@@ -1,5 +1,5 @@
-// pub const LICENSE: &'static str = r#"
-// MIT License
+pub const LICENSE: &'static str = r#"
+MIT License
 
 // Copyright (c) 2016 Ansley Peduru
 
