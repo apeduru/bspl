@@ -19,13 +19,13 @@ I wrote about the design of this project in DESIGN.md
 
 [awesome-bits](https://github.com/keonkim/awesome-bits)
 
-[Rsut Bitwise Operations](https://rosettacode.org/wiki/Bitwise_operations#Rust)
+[Rust Bitwise Operations](https://rosettacode.org/wiki/Bitwise_operations#Rust)
 
 [Precedence](http://introcs.cs.princeton.edu/java/11precedence/)
 
 [Shunting Yard Algorithm Python Implementation](http://rosettacode.org/wiki/Parsing/Shunting-yard_algorithm#Python)
 
-[An Overview of Lexers and Parsers](http://savage.net.au/Ron/html/graphviz2.marpa/Lexing.and.Parsing.Overview.html#My_Rules-of-Thumb_for_Writing_Lexers%2FParsers)
+[An Overview of Lexing and Parsing](http://savage.net.au/Ron/html/graphviz2.marpa/Lexing.and.Parsing.Overview.html)
 
 [How CPython's Compiler Works](https://www.youtube.com/watch?v=R31NRWgoIWM)
 
