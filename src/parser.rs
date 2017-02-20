@@ -3,8 +3,8 @@ use lexer::{Token, Tokens};
 use error::ParserError;
 use constants::KEYWORDS;
 
+// XXX: Change operator type from &'static str to String
 type Operators = HashMap<&'static str, Operator>;
-type Identifiers = HashMap<String, String>;
 
 #[derive(PartialEq, Debug)]
 enum Associativity {
@@ -23,7 +23,6 @@ impl Operator {
 
 pub struct Parser {
     operators: Operators,
-    identifiers: Identifiers,
     stack: Tokens,
     output: Tokens,
 }
@@ -32,11 +31,20 @@ impl Parser {
     fn new() -> Parser {
         Parser {
             operators: Operators::new(),
-            identifiers: Identifiers::new(),
             stack: Tokens::with_capacity(3),
             output: Tokens::with_capacity(3),
         }
     }
+
+    fn is_keyword(&mut self, identifier: &String) -> bool {
+        for keyword in KEYWORDS {
+            if keyword.to_string() == identifier.to_lowercase() {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     fn lower_precedence(&self, new_token: &Token, top_token: &Token) -> bool {
         let &Operator(new_token_prec, ref new_token_assoc) = match *new_token {
@@ -60,6 +68,14 @@ impl Parser {
         while let Some(&(position, ref token)) = iter.next() {
             match *token {
                 Token::Decimal(_) => self.output.push((position, token.clone())),
+
+                // Token::Identifier(ref id) => {
+                //     if self.is_keyword(id) {
+                //         return Err(ParserError::KeywordError(position, id.clone()));
+                //     } else {
+                //         self.stack.push((position, token.clone()));
+                //     }
+                // }
                 Token::Operator(ref name) => {
                     // if the token is an operator, o1, then:
                     // while there is an operator token o2, at the top of the
@@ -102,7 +118,7 @@ impl Parser {
                         }
                     }
                     if !found {
-                        return Err(ParserError::MissingBracket(position));
+                        return Err(ParserError::MissingOpeningBracket(position));
                     }
                 }
                 Token::Unknown(_) => {
@@ -115,7 +131,7 @@ impl Parser {
         loop {
             match self.stack.last() {
                 Some(&(position, Token::OpenBracket)) => {
-                    return Err(ParserError::MissingBracket(position))
+                    return Err(ParserError::MissingClosingBracket(position))
                 }
                 Some(_) => self.output.push(self.stack.pop().unwrap()),
                 None => break,
@@ -135,10 +151,12 @@ impl Default for Parser {
     fn default() -> Parser {
         let mut parser = Parser::new();
 
+        // XXX: Try to convert operators to String with .to_string()
         parser.operators.insert("(", Operator::new(1, Associativity::LeftToRight));
         parser.operators.insert(")", Operator::new(1, Associativity::LeftToRight));
         parser.operators.insert("~", Operator::new(2, Associativity::RightToLeft));
-        parser.operators.insert("-", Operator::new(2, Associativity::RightToLeft));
+        // TODO: Unary Minus
+        // parser.operators.insert("-", Operator::new(2, Associativity::RightToLeft));
         parser.operators.insert(">>", Operator::new(3, Associativity::LeftToRight));
         parser.operators.insert("<<", Operator::new(3, Associativity::LeftToRight));
         parser.operators.insert("&", Operator::new(4, Associativity::LeftToRight));

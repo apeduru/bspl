@@ -9,12 +9,29 @@ use bspl::constants::VERSION;
 use bspl::lexer::Lexer;
 use bspl::parser::Parser;
 use bspl::evaluator::Evaluator;
-use bspl::error::ParserError;
+use bspl::error::{ParserError, EvaluatorError};
 
 fn prelude() {
     println!("bspl {}", VERSION);
     println!("Bit-Shift-Print Loop");
     println!("Type 'help', or 'license' for more information.");
+}
+
+fn error_message(width: usize, msg: &'static str) {
+    println!("{caret:>width$}\n.. {}", msg, caret = "^", width = width);
+}
+
+fn display_results(x: &Vec<String>) {
+    for r in x {
+        println!(".. {}", r);
+    }
+
+    let y = x.last().unwrap();
+    println!(".. Dec: {}", y);
+    let h: i32 = y.parse().unwrap();
+    println!(".. Hex: 0x{:x}", h);
+    println!(".. Bin: 0b{:b}", h);
+
 }
 
 fn repl() {
@@ -25,7 +42,7 @@ fn repl() {
 
     let mut lexer = Lexer::new();
     let mut parser = Parser::default();
-    // let mut evaluator = Evaluator::new();
+    let mut evaluator = Evaluator::default();
 
     loop {
         match repl.readline(prompt) {
@@ -33,21 +50,25 @@ fn repl() {
                 repl.add_history_entry(&line);
                 match parser.parse(lexer.analyze(&line)) {
                     Ok(parsed_tokens) => {
-                        println!("{:?}", parsed_tokens);
-                        // let result: String = evaluator.evaluate(parsed_tokens);
+                        match evaluator.evaluate(parsed_tokens) {
+                            Ok(result) => {
+                                display_results(&result);
+                            }
+                            Err(EvaluatorError::MissingArgument(position)) => {
+                                error_message(position + prompt.len() + 1, "Missing Argument");
+                            }
+                            _ => continue,
+                        }
                     }
                     Err(ParserError::IllegalOperator(position)) => {
-                        println!("{caret:>width$}\n.. Illegal Operator",
-                                 caret = "^",
-                                 width = position + prompt.len() + 1);
+                        error_message(position + prompt.len() + 1, "Illegal Operator");
                     }
-                    Err(ParserError::MissingBracket(position)) => {
-                        println!("{caret:>width$}\n.. Missing Bracket",
-                                 caret = "^",
-                                 width = position + prompt.len() + 1);
+                    Err(ParserError::MissingOpeningBracket(position)) => {
+                        error_message(position + prompt.len() + 1, "Missing Opening Bracket");
                     }
-                    _ => break,
-
+                    Err(ParserError::MissingClosingBracket(position)) => {
+                        error_message(position + prompt.len() + 1, "Missing Closing Bracket");
+                    }
                 }
             }
             Err(ReadlineError::Eof) => break,

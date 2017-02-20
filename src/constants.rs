@@ -23,6 +23,6 @@ MIT License
 
 pub const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
-// pub const HELP: &'static str = r#""#;
+pub const HELP: &'static str = r#""#;
 
-pub const KEYWORDS: &'static [&'static str] = &["license", "exit", "help"];
+pub const KEYWORDS: &'static [&'static str] = &["license", "exit", "help", "version"];

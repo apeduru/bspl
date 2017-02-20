@@ -1,42 +1,78 @@
+use std::collections::HashMap;
+use lexer::{Token, Tokens};
+use constants::KEYWORDS;
+use function::{Function, Functions, functions};
 use error::EvaluatorError;
 
-pub struct Evaluator {
+type Identifiers = HashMap<String, String>;
 
+pub struct Evaluator {
+    identifiers: Identifiers,
+    functions: Functions,
 }
 
-// impl Evaluator {
-//     pub fn new() -> Evaluator {}
-//
-// fn is_keyword(&mut self, identifier: String) -> bool {
-//     for keyword in KEYWORDS {
-//         if keyword.to_string() == identifier.to_lowercase() {
-//             return true;
-//         }
-//     }
-//     return false;
-// }
+impl Evaluator {
+    pub fn new() -> Evaluator {
+        Evaluator {
+            identifiers: Identifiers::new(),
+            functions: Functions::new(),
+        }
+    }
 
+    // S = new empty stack
+    // while not eof
+    // t = read token
+    // if t is a binary operator
+    //     y = pop(S)
+    //     x = pop(S)
+    //     push(S, t(x, y))
+    // else
+    //     push(S, t)
+    // print the contents of the stack S
 
-// pub fn evaluate() {}
-// }
+    pub fn evaluate(&mut self, tokens: &Tokens) -> Result<Vec<String>, EvaluatorError> {
+        let mut result: Vec<String> = Vec::with_capacity(3);
+        let mut stack: Vec<i32> = Vec::with_capacity(3);
 
-pub mod functions {
-    pub fn not(mut a: i32) -> i32 {
-        !a
+        for &(position, ref token) in tokens {
+            match *token {
+                Token::Decimal(ref dec) => {
+                    stack.push(dec.parse().unwrap());
+                }
+                Token::Operator(ref op) => {
+                    let function = self.functions.get::<str>(&op).unwrap();
+                    if stack.len() >= function.arity {
+                        let l = stack.len();
+                        let args: Vec<i32> = stack.split_off(l - function.arity);
+                        let interm_result = (function.handle)(args).unwrap();
+                        stack.push(interm_result.0);
+                        result.push(interm_result.1);
+                        result.push(interm_result.0.to_string());
+                    } else {
+                        return Err(EvaluatorError::MissingArgument(position));
+                    }
+                }
+                _ => continue,
+
+            }
+        }
+        Ok(result)
     }
-    pub fn and(mut a: i32, mut b: i32) -> i32 {
-        a & b
-    }
-    pub fn or(mut a: i32, mut b: i32) -> i32 {
-        a | b
-    }
-    pub fn xor(mut a: i32, mut b: i32) -> i32 {
-        a ^ b
-    }
-    pub fn right_shift(mut a: i32, mut b: i32) -> i32 {
-        a >> b
-    }
-    pub fn left_shift(mut a: i32, mut b: i32) -> i32 {
-        a << b
+}
+
+impl Default for Evaluator {
+    fn default() -> Evaluator {
+        let mut evaluator = Evaluator::new();
+
+        // evaluator.functions.insert("-", Function::new(1, Box::new(functions::minus)));
+
+        evaluator.functions.insert("~", Function::new(1, Box::new(functions::not)));
+        evaluator.functions.insert("^", Function::new(2, Box::new(functions::xor)));
+        evaluator.functions.insert("|", Function::new(2, Box::new(functions::or)));
+        evaluator.functions.insert("&", Function::new(2, Box::new(functions::and)));
+        evaluator.functions.insert("<<", Function::new(2, Box::new(functions::lshift)));
+        evaluator.functions.insert(">>", Function::new(2, Box::new(functions::rshift)));
+
+        evaluator
     }
 }

@@ -107,9 +107,13 @@ impl Lexer {
                 }
             }
 
-            if (self.prev_state == State::Radix && self.curr_state != State::Radix) ||
-               (self.prev_state == State::Identifier && self.curr_state != State::Identifier) {
+            if self.prev_state == State::Radix && self.curr_state != State::Radix {
                 self.identify_radix(radix_position, &mut radix);
+            }
+
+            if self.prev_state == State::Identifier && self.curr_state != State::Identifier {
+                self.tokens.push((radix_position, Token::Identifier(radix.clone())));
+                radix.clear();
             }
 
             if self.prev_state == State::Shift && self.curr_state != State::Shift {
@@ -125,7 +129,12 @@ impl Lexer {
         }
 
         if !radix.is_empty() {
-            self.identify_radix(radix_position, &mut radix);
+            if self.curr_state == State::Radix {
+                self.identify_radix(radix_position, &mut radix);
+            } else if self.curr_state == State::Identifier {
+                self.tokens.push((radix_position, Token::Identifier(radix.clone())));
+                radix.clear();
+            }
         }
 
         if !shift.is_empty() {
