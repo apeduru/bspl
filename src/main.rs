@@ -1,15 +1,22 @@
-extern crate bspl;
+// extern crate bspl;
 extern crate tempfile;
 extern crate rustyline;
+
+mod lexer;
+mod parser;
+mod evaluator;
+mod error;
+mod constants;
+mod function;
 
 use rustyline::error::ReadlineError;
 use rustyline::Editor;
 use tempfile::NamedTempFile;
-use bspl::constants::VERSION;
-use bspl::lexer::Lexer;
-use bspl::parser::Parser;
-use bspl::evaluator::Evaluator;
-use bspl::error::{ParserError, EvaluatorError};
+use constants::VERSION;
+use lexer::Lexer;
+use parser::Parser;
+use evaluator::Evaluator;
+use error::{ParserError, EvaluatorError};
 
 fn prelude() {
     println!("bspl {}", VERSION);
@@ -55,7 +62,6 @@ fn repl() {
                             Err(EvaluatorError::MissingArgument(position)) => {
                                 error_message(position + prompt.len() + 1, "Missing Argument");
                             }
-                            _ => continue,
                         }
                     }
                     Err(ParserError::IllegalOperator(position)) => {
