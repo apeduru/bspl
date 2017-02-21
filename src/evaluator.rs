@@ -40,8 +40,8 @@ impl Evaluator {
                 Token::Operator(ref op) => {
                     let function = self.functions.get::<str>(&op).unwrap();
                     if stack.len() >= function.arity {
-                        let l = stack.len();
-                        let args: Vec<i32> = stack.split_off(l - function.arity);
+                        let stack_len = stack.len();
+                        let args: Vec<i32> = stack.split_off(stack_len - function.arity);
                         let interm_result = (function.handle)(args).unwrap();
                         stack.push(interm_result.0);
                         result.push(interm_result.1);
