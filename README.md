@@ -4,8 +4,30 @@ Bit-Shift-Print Loop
 ## Introduction
 
 `bspl` is a [REPL](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop)
-for practising bit-wise operations. Aimed at undergraduates in CS/SE/ECE or
-anyone that is interested in learning low level manipulations.
+for practising bitwise operations.
+
+Born out of frustration while completing labs for my undergrad operating systems
+course, I wanted a tool for quickly prototyping bitwise operations.
+
+![bspl](pics/bspl_screenshot.png)
+
+And the equivalent using the Python REPL.
+
+![Python](pics/python_screenshot.png)
+
+## Installation
+
+TODO: Learn how to package Rust binaries or as Debian package
+
+TODO: Target different CPU architectures
+
+TODO: Setup automatic Travis CI builds
+
+## Usage
+
+TODO: Explain allowable operators
+
+TODO: Examples
 
 ## Design
 
@@ -13,34 +35,10 @@ I wrote about the design of this project in [DESIGN.md](./DESIGN.md).
 
 ## References
 
-[Bit Twiddling Hacks](http://graphics.stanford.edu/~seander/bithacks.html)
-
-[Hacker's Delight](http://www.hackersdelight.org/)
-
-[awesome-bits](https://github.com/keonkim/awesome-bits)
-
-[Rust Bitwise Operations](https://rosettacode.org/wiki/Bitwise_operations#Rust)
-
-[Precedence](http://introcs.cs.princeton.edu/java/11precedence/)
-
-[Shunting Yard Algorithm Python Implementation](http://rosettacode.org/wiki/Parsing/Shunting-yard_algorithm#Python)
-
-[An Overview of Lexing and Parsing](http://savage.net.au/Ron/html/graphviz2.marpa/Lexing.and.Parsing.Overview.html)
-
-[How CPython's Compiler Works](https://www.youtube.com/watch?v=R31NRWgoIWM)
+See [REFERENCES.md](./REFERENCES.md).
 
 ## Roadmap
 
-Learn how parsers work
-
-Support for memory addressing
-
-Base Conversions: define a standard method e.g. 16:10 AF (Convert hexadecimal value to decimal)
-
-Operators: + - * / & | ~
-
-Explain why this offers a richer experience compared to the Python REPL.
+Base Conversions
 
 Add Octal to supported bases
-
-Support for equality: ==
