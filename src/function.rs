@@ -24,38 +24,37 @@ pub mod functions {
     type Operation = (i32, String);
 
     pub fn not(mut args: Vec<i32>) -> Result<Operation, EvaluatorError> {
-        let mut a: i32 = args.pop().unwrap();
+        let a: i32 = args.pop().unwrap();
         Ok((!a, format!("{}{}", "~".to_string(), a.to_string())))
     }
 
     pub fn and(mut args: Vec<i32>) -> Result<Operation, EvaluatorError> {
-        let mut b = args.pop().unwrap();
-        let mut a = args.pop().unwrap();
+        let b = args.pop().unwrap();
+        let a = args.pop().unwrap();
         Ok((a & b, format!("{} {} {}", a.to_string(), "&".to_string(), b.to_string())))
     }
 
     pub fn or(mut args: Vec<i32>) -> Result<Operation, EvaluatorError> {
-        let mut b = args.pop().unwrap();
-        let mut a = args.pop().unwrap();
+        let b = args.pop().unwrap();
+        let a = args.pop().unwrap();
         Ok((a | b, format!("{} {} {}", a.to_string(), "|".to_string(), b.to_string())))
     }
 
     pub fn xor(mut args: Vec<i32>) -> Result<Operation, EvaluatorError> {
-        let mut b = args.pop().unwrap();
-        let mut a = args.pop().unwrap();
+        let b = args.pop().unwrap();
+        let a = args.pop().unwrap();
         Ok((a ^ b, format!("{} {} {}", a.to_string(), "^".to_string(), b.to_string())))
     }
 
     pub fn rshift(mut args: Vec<i32>) -> Result<Operation, EvaluatorError> {
-        let mut b = args.pop().unwrap();
-        let mut a = args.pop().unwrap();
+        let b = args.pop().unwrap();
+        let a = args.pop().unwrap();
         Ok((a >> b, format!("{} {} {}", a.to_string(), ">>".to_string(), b.to_string())))
     }
 
     pub fn lshift(mut args: Vec<i32>) -> Result<Operation, EvaluatorError> {
-        let mut b = args.pop().unwrap();
-        let mut a = args.pop().unwrap();
+        let b = args.pop().unwrap();
+        let a = args.pop().unwrap();
         Ok((a << b, format!("{} {} {}", a.to_string(), "<<".to_string(), b.to_string())))
     }
-
 }
