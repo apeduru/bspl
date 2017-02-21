@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use lexer::{Token, Tokens};
 use error::ParserError;
-use constants::KEYWORDS;
 
 // XXX: Change operator type from &'static str to String
 type Operators = HashMap<&'static str, Operator>;
@@ -34,15 +33,6 @@ impl Parser {
             stack: Tokens::with_capacity(3),
             output: Tokens::with_capacity(3),
         }
-    }
-
-    fn is_keyword(&mut self, identifier: &String) -> bool {
-        for keyword in KEYWORDS {
-            if keyword.to_string() == identifier.to_lowercase() {
-                return true;
-            }
-        }
-        return false;
     }
 
 

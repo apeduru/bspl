@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use lexer::{Token, Tokens};
-use constants::KEYWORDS;
+// use constants::KEYWORDS;
 use function::{Function, Functions, functions};
 use error::EvaluatorError;
 
@@ -19,16 +19,14 @@ impl Evaluator {
         }
     }
 
-    // S = new empty stack
-    // while not eof
-    // t = read token
-    // if t is a binary operator
-    //     y = pop(S)
-    //     x = pop(S)
-    //     push(S, t(x, y))
-    // else
-    //     push(S, t)
-    // print the contents of the stack S
+    // fn is_keyword(&mut self, identifier: &String) -> bool {
+    //     for keyword in KEYWORDS {
+    //         if keyword.to_string() == identifier.to_lowercase() {
+    //             return true;
+    //         }
+    //     }
+    //     return false;
+    // }
 
     pub fn evaluate(&mut self, tokens: &Tokens) -> Result<Vec<String>, EvaluatorError> {
         let mut result: Vec<String> = Vec::with_capacity(3);
