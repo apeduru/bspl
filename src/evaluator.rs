@@ -1,20 +1,20 @@
-use std::collections::HashMap;
+// use std::collections::HashMap;
 use lexer::{Token, Tokens};
 // use constants::KEYWORDS;
 use function::{Function, Functions, functions};
 use error::EvaluatorError;
 
-type Identifiers = HashMap<String, String>;
+// type Identifiers = HashMap<String, String>;
 
 pub struct Evaluator {
-    identifiers: Identifiers,
+    // identifiers: Identifiers,
     functions: Functions,
 }
 
 impl Evaluator {
     pub fn new() -> Evaluator {
         Evaluator {
-            identifiers: Identifiers::new(),
+            // identifiers: Identifiers::new(),
             functions: Functions::new(),
         }
     }

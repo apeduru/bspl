@@ -57,21 +57,7 @@ impl Parser {
         while let Some(&(position, ref token)) = iter.next() {
             match *token {
                 Token::Decimal(_) => self.output.push((position, token.clone())),
-
-                // Token::Identifier(ref id) => {
-                //     if self.is_keyword(id) {
-                //         return Err(ParserError::KeywordError(position, id.clone()));
-                //     } else {
-                //         self.stack.push((position, token.clone()));
-                //     }
-                // }
                 Token::Operator(ref name) => {
-                    // if the token is an operator, o1, then:
-                    // while there is an operator token o2, at the top of the
-                    // operator stack and either o1 is left-associative and its
-                    // precedence is less than or equal to that of o2, or o1 is
-                    // right associative, and has precedence less than that of
-                    // o2, pop o2 off the operator stack, onto the output queue
                     if !self.operators.contains_key::<str>(&name) {
                         return Err(ParserError::IllegalOperator(position));
                     }
