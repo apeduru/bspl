@@ -62,8 +62,6 @@ impl Default for Evaluator {
     fn default() -> Evaluator {
         let mut evaluator = Evaluator::new();
 
-        // evaluator.functions.insert("-", Function::new(1, Box::new(functions::minus)));
-
         evaluator.functions.insert("~", Function::new(1, Box::new(functions::not)));
         evaluator.functions.insert("^", Function::new(2, Box::new(functions::xor)));
         evaluator.functions.insert("|", Function::new(2, Box::new(functions::or)));

@@ -143,8 +143,6 @@ impl Default for Parser {
         parser.operators.insert("(", Operator::new(1, Associativity::LeftToRight));
         parser.operators.insert(")", Operator::new(1, Associativity::LeftToRight));
         parser.operators.insert("~", Operator::new(2, Associativity::RightToLeft));
-        // TODO: Unary Minus
-        // parser.operators.insert("-", Operator::new(2, Associativity::RightToLeft));
         parser.operators.insert(">>", Operator::new(3, Associativity::LeftToRight));
         parser.operators.insert("<<", Operator::new(3, Associativity::LeftToRight));
         parser.operators.insert("&", Operator::new(4, Associativity::LeftToRight));
