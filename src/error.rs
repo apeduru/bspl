@@ -9,6 +9,6 @@ pub enum ParserError {
 pub enum EvaluatorError {
     // RadixError(usize),
     // KeywordError(usize, String),
-    UnknownIdentifier(usize, String),
+    // UnknownIdentifier(usize, String),
     MissingArgument(usize),
 }
