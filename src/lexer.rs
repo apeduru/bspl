@@ -4,9 +4,9 @@ pub enum Token {
     CloseBracket,
     Identifier(String), // Identifier, must be alphabetical
     Decimal(String), // Literal expression: 42
-    Binary(String), // Literal expression: 0b101010
+    // Binary(String), // Literal expression: 0b101010
     // Octal(String), // Literal expression: 0o052
-    Hexadecimal(String), // Literal expression: 0x2a
+    // Hexadecimal(String), // Literal expression: 0x2a
     Radix(String), // Non-{Bin, Hex, Dec, Oct}
     Operator(String),
     // Assignment(String),
