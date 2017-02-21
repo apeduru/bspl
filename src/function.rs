@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 use error::EvaluatorError;
 
+type Operation = (i32, String);
 pub type Functions = HashMap<&'static str, Function>;
-pub type Operation = (i32, String);
 pub type FunctionHandle = Box<Fn(Vec<i32>) -> Result<Operation, EvaluatorError>>;
 
 pub struct Function {
@@ -20,12 +20,8 @@ impl Function {
 }
 
 pub mod functions {
-    pub type Operation = (i32, String);
     use error::EvaluatorError;
-
-    // pub fn minus(mut args: Vec<i32>) -> Result<i32, EvaluatorError> {
-    //     Ok(-args.pop().unwrap())
-    // }
+    type Operation = (i32, String);
 
     pub fn not(mut args: Vec<i32>) -> Result<Operation, EvaluatorError> {
         let mut a: i32 = args.pop().unwrap();
