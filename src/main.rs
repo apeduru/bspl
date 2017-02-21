@@ -21,17 +21,15 @@ fn error_message(width: usize, msg: &'static str) {
     println!("{caret:>width$}\n.. {}", msg, caret = "^", width = width);
 }
 
-fn display_results(x: &Vec<String>) {
-    for r in x {
-        println!(".. {}", r);
+fn display_results(results: &Vec<String>) {
+    for result in results {
+        println!(".. {}", result);
     }
 
-    let y = x.last().unwrap();
-    println!(".. Dec: {}", y);
-    let h: i32 = y.parse().unwrap();
-    println!(".. Hex: 0x{:x}", h);
-    println!(".. Bin: 0b{:b}", h);
-
+    let final_result: i32 = results.last().unwrap().parse().unwrap();
+    println!(".. Dec: {}", final_result);
+    println!(".. Hex: 0x{:x}", final_result);
+    println!(".. Bin: 0b{:b}", final_result);
 }
 
 fn repl() {
