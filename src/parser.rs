@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use lexer::{Token, Tokens};
 use error::ParserError;
 
-// XXX: Change operator type from &'static str to String
 type Operators = HashMap<&'static str, Operator>;
 
 #[derive(PartialEq, Debug)]
@@ -141,7 +140,6 @@ impl Default for Parser {
     fn default() -> Parser {
         let mut parser = Parser::new();
 
-        // XXX: Try to convert operators to String with .to_string()
         parser.operators.insert("(", Operator::new(1, Associativity::LeftToRight));
         parser.operators.insert(")", Operator::new(1, Associativity::LeftToRight));
         parser.operators.insert("~", Operator::new(2, Associativity::RightToLeft));
