@@ -130,8 +130,6 @@ impl Default for Parser {
     fn default() -> Parser {
         let mut parser = Parser::new();
 
-        parser.operators.insert("(", Operator::new(1, Associativity::LeftToRight));
-        parser.operators.insert(")", Operator::new(1, Associativity::LeftToRight));
         parser.operators.insert("~", Operator::new(2, Associativity::RightToLeft));
         parser.operators.insert(">>", Operator::new(3, Associativity::LeftToRight));
         parser.operators.insert("<<", Operator::new(3, Associativity::LeftToRight));
