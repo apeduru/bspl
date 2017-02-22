@@ -50,8 +50,8 @@ impl Parser {
             _ => unreachable!(),
         };
 
-        (*new_token_assoc == Associativity::LeftToRight && new_token_prec <= top_token_prec) ||
-        (*new_token_assoc == Associativity::RightToLeft && new_token_prec < top_token_prec)
+        (*new_token_assoc == Associativity::LeftToRight && new_token_prec > top_token_prec) ||
+        (*new_token_assoc == Associativity::RightToLeft && new_token_prec >= top_token_prec)
     }
 
     pub fn parse(&mut self, tokens: &Tokens) -> Result<&Tokens, ParserError> {
