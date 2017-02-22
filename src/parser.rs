@@ -37,12 +37,16 @@ impl Parser {
 
     fn lower_precedence(&self, new_token: &Token, top_token: &Token) -> bool {
         let &Operator(new_token_prec, ref new_token_assoc) = match *new_token {
-            Token::Operator(ref name) => self.operators.get::<str>(&name).unwrap(),
+            Token::Operator(ref new_token_name) => {
+                self.operators.get::<str>(&new_token_name).unwrap()
+            }
             _ => unreachable!(),
         };
 
         let &Operator(top_token_prec, _) = match *top_token {
-            Token::Operator(ref name) => self.operators.get::<str>(&name).unwrap(),
+            Token::Operator(ref top_token_name) => {
+                self.operators.get::<str>(&top_token_name).unwrap()
+            }
             _ => unreachable!(),
         };
 
