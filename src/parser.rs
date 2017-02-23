@@ -54,7 +54,7 @@ impl Parser {
         (*new_token_assoc == Associativity::RightToLeft && new_token_prec >= top_token_prec)
     }
 
-    pub fn parse(&mut self, tokens: &Tokens) -> Result<&Tokens, ParserError> {
+    pub fn parse(&mut self, tokens: Tokens) -> Result<&Tokens, ParserError> {
         self.reset_parser();
 
         let mut iter = tokens.iter().peekable();

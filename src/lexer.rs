@@ -30,7 +30,6 @@ enum State {
 pub type Tokens = Vec<(usize, Token)>;
 
 pub struct Lexer {
-    tokens: Tokens,
     curr_state: State,
     prev_state: State,
 }
@@ -38,14 +37,13 @@ pub struct Lexer {
 impl Lexer {
     pub fn new() -> Lexer {
         Lexer {
-            tokens: Tokens::with_capacity(10),
             curr_state: State::Front,
             prev_state: State::General,
         }
     }
 
-    pub fn analyze(&mut self, line: &str) -> &Tokens {
-        self.reset_lexer();
+    pub fn analyze(&mut self, line: &str) -> Tokens {
+        let mut tokens = Tokens::new();
 
         let mut radix = String::with_capacity(2);
         let mut shift = String::with_capacity(2);
@@ -60,6 +58,7 @@ impl Lexer {
 
             let mut token = Token::Skip;
             self.prev_state = self.curr_state;
+
             match character {
                 ')' => {
                     token = Token::CloseBracket;
@@ -108,21 +107,23 @@ impl Lexer {
             }
 
             if self.prev_state == State::Radix && self.curr_state != State::Radix {
-                self.identify_radix(radix_position, &mut radix);
+                let radix_token = self.identify_radix(&mut radix);
+                tokens.push((radix_position, radix_token));
+                radix.clear();
             }
 
             if self.prev_state == State::Identifier && self.curr_state != State::Identifier {
-                self.tokens.push((radix_position, Token::Identifier(radix.clone())));
+                tokens.push((radix_position, Token::Identifier(radix.clone())));
                 radix.clear();
             }
 
             if self.prev_state == State::Shift && self.curr_state != State::Shift {
-                self.tokens.push((shift_position, Token::Operator(shift.clone())));
+                tokens.push((shift_position, Token::Operator(shift.clone())));
                 shift.clear();
             }
 
             if token != Token::Skip {
-                self.tokens.push((start_position, token.clone()));
+                tokens.push((start_position, token.clone()));
             }
 
 
@@ -130,35 +131,34 @@ impl Lexer {
 
         if !radix.is_empty() {
             if self.curr_state == State::Radix {
-                self.identify_radix(radix_position, &mut radix);
+                let radix_token = self.identify_radix(&mut radix);
+                tokens.push((radix_position, radix_token));
             } else if self.curr_state == State::Identifier {
-                self.tokens.push((radix_position, Token::Identifier(radix.clone())));
-                radix.clear();
+                tokens.push((radix_position, Token::Identifier(radix.clone())));
             }
         }
 
         if !shift.is_empty() {
-            self.tokens.push((shift_position, Token::Operator(shift.clone())));
-            shift.clear();
+            tokens.push((shift_position, Token::Operator(shift.clone())));
         }
 
-        &self.tokens
+        self.reset_lexer();
+
+        tokens
     }
 
-    fn identify_radix(&mut self, position: usize, radix: &mut String) {
+    fn identify_radix(&mut self, radix: &mut String) -> Token {
         if !radix.parse::<i32>().is_err() {
-            self.tokens.push((position, Token::Decimal(radix.clone())));
+            return Token::Decimal(radix.clone());
         } else {
-            self.tokens.push((position, Token::Radix(radix.clone())));
+            return Token::Radix(radix.clone());
         }
-        radix.clear();
     }
 
 
     fn reset_lexer(&mut self) {
         self.curr_state = State::Front;
         self.prev_state = State::General;
-        self.tokens.clear();
     }
 }
 
