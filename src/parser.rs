@@ -21,17 +21,11 @@ impl Operator {
 
 pub struct Parser {
     operators: Operators,
-    stack: Tokens,
-    output: Tokens,
 }
 
 impl Parser {
     fn new() -> Parser {
-        Parser {
-            operators: Operators::new(),
-            stack: Tokens::with_capacity(3),
-            output: Tokens::with_capacity(3),
-        }
+        Parser { operators: Operators::new() }
     }
 
 
@@ -54,23 +48,24 @@ impl Parser {
         (*new_token_assoc == Associativity::RightToLeft && new_token_prec >= top_token_prec)
     }
 
-    pub fn parse(&mut self, tokens: Tokens) -> Result<&Tokens, ParserError> {
-        self.reset_parser();
+    pub fn parse(&mut self, tokens: Tokens) -> Result<Tokens, ParserError> {
+        let mut stack = Tokens::new();
+        let mut output = Tokens::new();
 
-        let mut iter = tokens.iter().peekable();
-        while let Some(&(position, ref token)) = iter.next() {
+        let mut token_iterator = tokens.iter().peekable();
+        while let Some(&(position, ref token)) = token_iterator.next() {
             match *token {
-                Token::Decimal(_) => self.output.push((position, token.clone())),
+                Token::Decimal(_) => output.push((position, token.clone())),
                 Token::Operator(ref name) => {
                     if !self.operators.contains_key::<str>(&name) {
                         return Err(ParserError::IllegalOperator(position));
                     }
 
                     loop {
-                        match self.stack.last() {
+                        match stack.last() {
                             Some(&(_, Token::Operator(_))) => {
-                                if self.lower_precedence(&token, &self.stack.last().unwrap().1) {
-                                    self.output.push(self.stack.pop().unwrap());
+                                if self.lower_precedence(&token, &stack.last().unwrap().1) {
+                                    output.push(stack.pop().unwrap());
                                 } else {
                                     break;
                                 }
@@ -79,21 +74,21 @@ impl Parser {
                         }
                     }
 
-                    self.stack.push((position, token.clone()));
+                    stack.push((position, token.clone()));
                 }
-                Token::OpenBracket => self.stack.push((position, token.clone())),
+                Token::OpenBracket => stack.push((position, token.clone())),
                 Token::CloseBracket => {
                     let mut found = false;
 
                     loop {
-                        match self.stack.last() {
+                        match stack.last() {
                             Some(&(_, Token::OpenBracket)) => {
                                 found = true;
-                                self.stack.pop();
+                                stack.pop();
                                 break;
                             }
                             None => break,
-                            _ => self.output.push(self.stack.pop().unwrap()),
+                            _ => output.push(stack.pop().unwrap()),
                         }
                     }
                     if !found {
@@ -108,21 +103,16 @@ impl Parser {
             }
         }
         loop {
-            match self.stack.last() {
+            match stack.last() {
                 Some(&(position, Token::OpenBracket)) => {
                     return Err(ParserError::MissingClosingBracket(position))
                 }
-                Some(_) => self.output.push(self.stack.pop().unwrap()),
+                Some(_) => output.push(stack.pop().unwrap()),
                 None => break,
             }
         }
 
-        Ok((&self.output))
-    }
-
-    fn reset_parser(&mut self) {
-        self.stack.clear();
-        self.output.clear();
+        Ok(output)
     }
 }
 

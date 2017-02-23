@@ -29,11 +29,11 @@ impl Evaluator {
     //     return false;
     // }
 
-    pub fn evaluate(&mut self, tokens: &Tokens) -> Result<Vec<String>, EvaluatorError> {
+    pub fn evaluate(&mut self, tokens: Tokens) -> Result<Vec<String>, EvaluatorError> {
         let mut result: Vec<String> = Vec::with_capacity(3);
         let mut stack: Vec<i32> = Vec::with_capacity(3);
 
-        for &(position, ref token) in tokens {
+        for (position, ref token) in tokens {
             match *token {
                 Token::Decimal(ref dec) => {
                     stack.push(dec.parse().unwrap());
