@@ -52,7 +52,7 @@ impl Parser {
         let mut stack = Tokens::new();
         let mut output = Tokens::new();
 
-        let mut token_iterator = tokens.iter().peekable();
+        let mut token_iterator = tokens.iter();
         while let Some(&(position, ref token)) = token_iterator.next() {
             match *token {
                 Token::Decimal(_) => output.push((position, token.clone())),
