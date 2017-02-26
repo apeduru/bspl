@@ -7,7 +7,7 @@ Bit-Shift-Print Loop
 for practising bitwise operations.
 
 Born out of frustration while completing labs for my undergrad operating systems
-course, I wanted a tool for quickly prototyping bitwise operations.
+course, I wanted a tool for quickly prototyping and tracing complex bitwise operations.
 
 ![bspl](pics/bspl_screenshot.png)
 
@@ -42,3 +42,5 @@ See [REFERENCES.md](./REFERENCES.md).
 Base Conversions
 
 Add Octal to supported bases
+
+Unit tests lmao
