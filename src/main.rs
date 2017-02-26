@@ -62,6 +62,9 @@ fn repl() {
                             }
                         }
                     }
+                    Err(ParserError::RadixError(position)) => {
+                        error_message(position + prompt.len() + 1, "Radix Error");
+                    }
                     Err(ParserError::UnknownOperator(position)) => {
                         error_message(position + prompt.len() + 1, "Unknown Operator");
                     }

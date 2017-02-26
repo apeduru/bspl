@@ -52,6 +52,9 @@ impl Parser {
         while let Some(&(position, ref token)) = token_iterator.next() {
             match *token {
                 Token::Decimal(_) => output.push((position, token.clone())),
+                Token::Radix(_) => {
+                    return Err(ParserError::RadixError(position));
+                }
                 Token::Operator(ref name) => {
                     if !self.operators.contains_key(&name) {
                         return Err(ParserError::UnknownOperator(position));

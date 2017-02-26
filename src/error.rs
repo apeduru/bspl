@@ -1,5 +1,6 @@
 #[derive(Debug, PartialEq)]
 pub enum ParserError {
+    RadixError(usize),
     UnknownOperator(usize),
     MissingOpeningBracket(usize),
     MissingClosingBracket(usize),
@@ -7,7 +8,6 @@ pub enum ParserError {
 
 #[derive(Debug, PartialEq)]
 pub enum EvaluatorError {
-    // RadixError(usize),
     // KeywordError(usize, String),
     // UnknownIdentifier(usize, String),
     MissingArgument(usize),
