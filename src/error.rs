@@ -1,6 +1,6 @@
 #[derive(Debug, PartialEq)]
 pub enum ParserError {
-    IllegalOperator(usize),
+    UnknownOperator(usize),
     MissingOpeningBracket(usize),
     MissingClosingBracket(usize),
 }

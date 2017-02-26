@@ -1,4 +1,4 @@
-// pub const LICENSE: &'static str = r#"
+pub const LICENSE: &'static str = r#"
 // MIT License
 
 // Copyright (c) 2016 Ansley Peduru
@@ -23,6 +23,6 @@
 
 pub const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
-// pub const HELP: &'static str = r#""#;
+pub const HELP: &'static str = r#""#;
 
-// pub const KEYWORDS: &'static [&'static str] = &["license", "exit", "help", "version"];
+pub const KEYWORDS: &'static [&'static str] = &["license", "exit", "help", "version"];

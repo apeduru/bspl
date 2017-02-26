@@ -1,8 +1,9 @@
 use std::collections::HashMap;
 use error::EvaluatorError;
+use lexer::Symbol;
 
 type Operation = (i32, String);
-pub type Functions = HashMap<&'static str, Function>;
+pub type Functions = HashMap<Symbol, Function>;
 pub type FunctionHandle = Box<Fn(Vec<i32>) -> Result<Operation, EvaluatorError>>;
 
 pub struct Function {

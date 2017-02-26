@@ -1,4 +1,3 @@
-// extern crate bspl;
 extern crate tempfile;
 extern crate rustyline;
 
@@ -32,7 +31,6 @@ fn display_results(results: &Vec<String>) {
     for result in results {
         println!(".. {}", result);
     }
-
     let final_result: i32 = results.last().unwrap().parse().unwrap();
     println!(".. Dec: {}", final_result);
     println!(".. Hex: 0x{:x}", final_result);
@@ -64,8 +62,8 @@ fn repl() {
                             }
                         }
                     }
-                    Err(ParserError::IllegalOperator(position)) => {
-                        error_message(position + prompt.len() + 1, "Illegal Operator");
+                    Err(ParserError::UnknownOperator(position)) => {
+                        error_message(position + prompt.len() + 1, "Unknown Operator");
                     }
                     Err(ParserError::MissingOpeningBracket(position)) => {
                         error_message(position + prompt.len() + 1, "Missing Opening Bracket");
@@ -74,7 +72,9 @@ fn repl() {
                         error_message(position + prompt.len() + 1, "Missing Closing Bracket");
                     }
                 }
+
             }
+
             Err(ReadlineError::Eof) => break,
             Err(ReadlineError::Interrupted) => {
                 println!("Type 'exit' or press Ctrl-D to leave bspl");

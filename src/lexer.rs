@@ -1,3 +1,13 @@
+#[derive(Debug, Eq, Hash, PartialEq, Clone)]
+pub enum Symbol {
+    OR,
+    AND,
+    XOR,
+    NOT,
+    RSHIFT,
+    LSHIFT,
+}
+
 #[derive(Debug, PartialEq, Clone)]
 pub enum Token {
     OpenBracket,
@@ -8,11 +18,10 @@ pub enum Token {
     // Octal(String), // Literal expression: 0o052
     // Hexadecimal(String), // Literal expression: 0x2a
     Radix(String), // Non-{Bin, Hex, Dec, Oct}
-    Operator(String),
+    Operator(Symbol),
     // Assignment(String),
     Unknown(char),
-    // Placeholder/Don't care token. Every character is tokenized.
-    Skip,
+    Skip, // Placeholder/Don't care token. Every character is tokenized.
 }
 
 #[derive(PartialEq, Copy, Clone, Debug)]
@@ -23,7 +32,6 @@ enum State {
     Operator,
     Shift,
     // Assignment,
-    Identifier,
     Radix,
 }
 
@@ -47,11 +55,10 @@ impl Lexer {
 
         let mut radix = String::with_capacity(2);
         let mut shift = String::with_capacity(2);
-        let mut start_position: usize = 0;
         let mut radix_position: usize = 0;
         let mut shift_position: usize = 0;
 
-        for (position, character) in line.trim().chars().enumerate() {
+        for (position, character) in line.chars().enumerate() {
             if character.is_whitespace() {
                 continue;
             }
@@ -62,17 +69,26 @@ impl Lexer {
             match character {
                 ')' => {
                     token = Token::CloseBracket;
-                    start_position = position;
                     self.curr_state = State::Bracket;
                 }
                 '(' => {
                     token = Token::OpenBracket;
-                    start_position = position;
                     self.curr_state = State::Bracket;
                 }
-                '^' | '&' | '|' | '~' | '-' => {
-                    token = Token::Operator(character.to_string());
-                    start_position = position;
+                '^' => {
+                    token = Token::Operator(Symbol::XOR);
+                    self.curr_state = State::Operator;
+                }
+                '&' => {
+                    token = Token::Operator(Symbol::AND);
+                    self.curr_state = State::Operator;
+                }
+                '|' => {
+                    token = Token::Operator(Symbol::OR);
+                    self.curr_state = State::Operator;
+                }
+                '~' => {
+                    token = Token::Operator(Symbol::NOT);
                     self.curr_state = State::Operator;
                 }
                 '>' | '<' => {
@@ -82,17 +98,7 @@ impl Lexer {
                     shift.push(character);
                     self.curr_state = State::Shift;
                 }
-                _ if character.is_alphabetic() => {
-                    if radix.is_empty() {
-                        radix_position = position;
-                    }
-                    radix.push(character);
-                    if self.curr_state != State::Radix {
-                        self.curr_state = State::Identifier;
-                    }
-
-                }
-                _ if character.is_numeric() => {
+                _ if character.is_alphanumeric() => {
                     if radix.is_empty() {
                         radix_position = position;
                     }
@@ -101,45 +107,30 @@ impl Lexer {
                 }
                 _ => {
                     token = Token::Unknown(character);
-                    start_position = position;
                     self.curr_state = State::General;
                 }
             }
 
             if self.prev_state == State::Radix && self.curr_state != State::Radix {
-                let radix_token = self.identify_radix(&mut radix);
-                tokens.push((radix_position, radix_token));
-                radix.clear();
+                self.identify_radix(radix_position, &mut tokens, &mut radix);
             }
 
-            if self.prev_state == State::Identifier && self.curr_state != State::Identifier {
-                tokens.push((radix_position, Token::Identifier(radix.clone())));
-                radix.clear();
-            }
-
-            if self.prev_state == State::Shift && self.curr_state != State::Shift {
-                tokens.push((shift_position, Token::Operator(shift.clone())));
-                shift.clear();
+            if (shift.len() == 2 && self.curr_state == State::Shift) ||
+               (shift.len() > 0 && self.curr_state != State::Shift) {
+                self.identify_shift(shift_position, &mut tokens, &mut shift);
             }
 
             if token != Token::Skip {
-                tokens.push((start_position, token.clone()));
+                tokens.push((position, token.clone()));
             }
-
 
         }
 
         if !radix.is_empty() {
-            if self.curr_state == State::Radix {
-                let radix_token = self.identify_radix(&mut radix);
-                tokens.push((radix_position, radix_token));
-            } else if self.curr_state == State::Identifier {
-                tokens.push((radix_position, Token::Identifier(radix.clone())));
-            }
+            self.identify_radix(radix_position, &mut tokens, &mut radix);
         }
-
         if !shift.is_empty() {
-            tokens.push((shift_position, Token::Operator(shift.clone())));
+            self.identify_shift(shift_position, &mut tokens, &mut shift);
         }
 
         self.reset_lexer();
@@ -147,12 +138,30 @@ impl Lexer {
         tokens
     }
 
-    fn identify_radix(&mut self, radix: &mut String) -> Token {
-        if !radix.parse::<i32>().is_err() {
-            return Token::Decimal(radix.clone());
+    fn identify_shift(&self, position: usize, tokens: &mut Tokens, shift: &mut String) {
+        if shift.as_str() == "<<" {
+            tokens.push((position, Token::Operator(Symbol::LSHIFT)));
+        } else if shift.as_str() == ">>" {
+            tokens.push((position, Token::Operator(Symbol::RSHIFT)));
         } else {
-            return Token::Radix(radix.clone());
+            let mut err_position = position;
+            for ch in shift.chars() {
+                tokens.push((err_position, Token::Unknown(ch)));
+                err_position += 1;
+            }
         }
+        shift.clear();
+    }
+
+    fn identify_radix(&self, position: usize, tokens: &mut Tokens, radix: &mut String) {
+        if !radix.parse::<i32>().is_err() {
+            tokens.push((position, Token::Decimal(radix.clone())));
+        } else if radix.chars().all(|x| x.is_alphabetic()) {
+            tokens.push((position, Token::Identifier(radix.clone())));
+        } else {
+            tokens.push((position, Token::Radix(radix.clone())));
+        }
+        radix.clear();
     }
 
 

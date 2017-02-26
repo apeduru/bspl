@@ -1,8 +1,8 @@
 use std::collections::HashMap;
-use lexer::{Token, Tokens};
+use lexer::{Symbol, Token, Tokens};
 use error::ParserError;
 
-type Operators = HashMap<&'static str, Operator>;
+type Operators = HashMap<Symbol, Operator>;
 
 #[derive(PartialEq, Debug)]
 enum Associativity {
@@ -31,16 +31,12 @@ impl Parser {
 
     fn lower_precedence(&self, new_token: &Token, top_token: &Token) -> bool {
         let &Operator(new_token_prec, ref new_token_assoc) = match *new_token {
-            Token::Operator(ref new_token_name) => {
-                self.operators.get::<str>(&new_token_name).unwrap()
-            }
+            Token::Operator(ref new_token_name) => self.operators.get(&new_token_name).unwrap(),
             _ => unreachable!(),
         };
 
         let &Operator(top_token_prec, _) = match *top_token {
-            Token::Operator(ref top_token_name) => {
-                self.operators.get::<str>(&top_token_name).unwrap()
-            }
+            Token::Operator(ref top_token_name) => self.operators.get(&top_token_name).unwrap(),
             _ => unreachable!(),
         };
 
@@ -57,8 +53,8 @@ impl Parser {
             match *token {
                 Token::Decimal(_) => output.push((position, token.clone())),
                 Token::Operator(ref name) => {
-                    if !self.operators.contains_key::<str>(&name) {
-                        return Err(ParserError::IllegalOperator(position));
+                    if !self.operators.contains_key(&name) {
+                        return Err(ParserError::UnknownOperator(position));
                     }
 
                     loop {
@@ -96,7 +92,7 @@ impl Parser {
                     }
                 }
                 Token::Unknown(_) => {
-                    return Err(ParserError::IllegalOperator(position));
+                    return Err(ParserError::UnknownOperator(position));
                 }
                 _ => continue,
 
@@ -120,12 +116,12 @@ impl Default for Parser {
     fn default() -> Parser {
         let mut parser = Parser::new();
 
-        parser.operators.insert("~", Operator::new(2, Associativity::RightToLeft));
-        parser.operators.insert(">>", Operator::new(3, Associativity::LeftToRight));
-        parser.operators.insert("<<", Operator::new(3, Associativity::LeftToRight));
-        parser.operators.insert("&", Operator::new(4, Associativity::LeftToRight));
-        parser.operators.insert("^", Operator::new(5, Associativity::LeftToRight));
-        parser.operators.insert("|", Operator::new(6, Associativity::LeftToRight));
+        parser.operators.insert(Symbol::NOT, Operator::new(2, Associativity::RightToLeft));
+        parser.operators.insert(Symbol::RSHIFT, Operator::new(3, Associativity::LeftToRight));
+        parser.operators.insert(Symbol::LSHIFT, Operator::new(3, Associativity::LeftToRight));
+        parser.operators.insert(Symbol::AND, Operator::new(4, Associativity::LeftToRight));
+        parser.operators.insert(Symbol::XOR, Operator::new(5, Associativity::LeftToRight));
+        parser.operators.insert(Symbol::OR, Operator::new(6, Associativity::LeftToRight));
 
         parser
     }

@@ -1,6 +1,5 @@
-
 // use std::collections::HashMap;
-use lexer::{Token, Tokens};
+use lexer::{Symbol, Token, Tokens};
 // use constants::KEYWORDS;
 use function::{Function, Functions, functions};
 use error::EvaluatorError;
@@ -39,7 +38,7 @@ impl Evaluator {
                     stack.push(dec.parse().unwrap());
                 }
                 Token::Operator(ref op) => {
-                    let function = self.functions.get::<str>(&op).unwrap();
+                    let function = self.functions.get(&op).unwrap();
                     if stack.len() >= function.arity {
                         let stack_len = stack.len();
                         let args: Vec<i32> = stack.split_off(stack_len - function.arity);
@@ -63,12 +62,14 @@ impl Default for Evaluator {
     fn default() -> Evaluator {
         let mut evaluator = Evaluator::new();
 
-        evaluator.functions.insert("~", Function::new(1, Box::new(functions::not)));
-        evaluator.functions.insert("^", Function::new(2, Box::new(functions::xor)));
-        evaluator.functions.insert("|", Function::new(2, Box::new(functions::or)));
-        evaluator.functions.insert("&", Function::new(2, Box::new(functions::and)));
-        evaluator.functions.insert("<<", Function::new(2, Box::new(functions::lshift)));
-        evaluator.functions.insert(">>", Function::new(2, Box::new(functions::rshift)));
+        evaluator.functions.insert(Symbol::NOT, Function::new(1, Box::new(functions::not)));
+        evaluator.functions.insert(Symbol::XOR, Function::new(2, Box::new(functions::xor)));
+        evaluator.functions.insert(Symbol::OR, Function::new(2, Box::new(functions::or)));
+        evaluator.functions.insert(Symbol::AND, Function::new(2, Box::new(functions::and)));
+        evaluator.functions.insert(Symbol::LSHIFT,
+                                   Function::new(2, Box::new(functions::lshift)));
+        evaluator.functions.insert(Symbol::RSHIFT,
+                                   Function::new(2, Box::new(functions::rshift)));
 
         evaluator
     }
