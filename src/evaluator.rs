@@ -1,32 +1,16 @@
-// use std::collections::HashMap;
 use lexer::{Symbol, Token, Tokens};
-// use constants::KEYWORDS;
 use function::{Function, Functions, functions};
 use error::EvaluatorError;
 
-// type Identifiers = HashMap<String, String>;
 
 pub struct Evaluator {
-    // identifiers: Identifiers,
     functions: Functions,
 }
 
 impl Evaluator {
     pub fn new() -> Evaluator {
-        Evaluator {
-            // identifiers: Identifiers::new(),
-            functions: Functions::new(),
-        }
+        Evaluator { functions: Functions::new() }
     }
-
-    // fn is_keyword(&mut self, identifier: &String) -> bool {
-    //     for keyword in KEYWORDS {
-    //         if keyword.to_string() == identifier.to_lowercase() {
-    //             return true;
-    //         }
-    //     }
-    //     return false;
-    // }
 
     pub fn evaluate(&mut self, tokens: Tokens) -> Result<Vec<String>, EvaluatorError> {
         let mut result: Vec<String> = Vec::with_capacity(3);

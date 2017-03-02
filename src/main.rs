@@ -20,7 +20,6 @@ use error::{ParserError, EvaluatorError};
 fn prelude() {
     println!("bspl {}", VERSION);
     println!("Bit-Shift-Print Loop");
-    println!("Type 'help', or 'license' for more information.");
 }
 
 fn error_message(width: usize, msg: &'static str) {
@@ -75,12 +74,10 @@ fn repl() {
                         error_message(position + prompt.len() + 1, "Missing Closing Bracket");
                     }
                 }
-
             }
-
             Err(ReadlineError::Eof) => break,
             Err(ReadlineError::Interrupted) => {
-                println!("Type 'exit' or press Ctrl-D to leave bspl");
+                println!("Press Ctrl-D to leave bspl");
                 continue;
             }
             Err(err) => {

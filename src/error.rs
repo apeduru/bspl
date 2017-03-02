@@ -8,7 +8,5 @@ pub enum ParserError {
 
 #[derive(Debug, PartialEq)]
 pub enum EvaluatorError {
-    // KeywordError(usize, String),
-    // UnknownIdentifier(usize, String),
     MissingArgument(usize),
 }

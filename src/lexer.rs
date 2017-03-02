@@ -12,14 +12,9 @@ pub enum Symbol {
 pub enum Token {
     OpenBracket,
     CloseBracket,
-    Identifier(String), // Identifier, must be alphabetical
     Decimal(String), // Literal expression: 42
-    // Binary(String), // Literal expression: 0b101010
-    // Octal(String), // Literal expression: 0o052
-    // Hexadecimal(String), // Literal expression: 0x2a
-    Radix(String), // Non-{Bin, Hex, Dec, Oct}
+    Radix(String), // Non-Dec
     Operator(Symbol),
-    // Assignment(String),
     Unknown(char),
     Skip, // Placeholder/Don't care token. Every character is tokenized.
 }
@@ -31,7 +26,6 @@ enum State {
     Bracket,
     Operator,
     Shift,
-    // Assignment,
     Radix,
 }
 
@@ -156,8 +150,6 @@ impl Lexer {
     fn identify_radix(&self, position: usize, tokens: &mut Tokens, radix: &mut String) {
         if !radix.parse::<i32>().is_err() {
             tokens.push((position, Token::Decimal(radix.clone())));
-        } else if radix.chars().all(|x| x.is_alphabetic()) {
-            tokens.push((position, Token::Identifier(radix.clone())));
         } else {
             tokens.push((position, Token::Radix(radix.clone())));
         }
@@ -170,7 +162,3 @@ impl Lexer {
         self.prev_state = State::General;
     }
 }
-
-
-// #[cfg(test)]
-// mod tests {}

@@ -3,8 +3,16 @@ name = "bspl"
 version = "0.1.0"
 authors = ["Ansley Peduru <ansleypeduru96@gmail.com>"]
 repository = "https://github.com/apeduru/bspl.git"
+homepage = "https://github.com/apeduru/bspl.git"
+license = "MIT"
+license-file= "LICENSE"
 readme = "README.md"
-description = "A REPL for pracitising bit-wise operations"
+description = "A REPL for pracitising bitwise operations"
+
+exclude = [
+    "debian/*",
+    "Makefile"
+]
 
 [dependencies]
 rustyline = "1.0.0"
