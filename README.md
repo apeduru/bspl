@@ -17,11 +17,12 @@ And the equivalent using the Python REPL.
 
 ## Installation
 
-TODO: Learn how to package Rust binaries or as Debian package
+### Cargo
 
-TODO: Target different CPU architectures
+`cargo install bspl`
 
-TODO: Setup automatic Travis CI builds
+### Debian, Ubuntu
+
 
 ## Usage
 
