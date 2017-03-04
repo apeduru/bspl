@@ -44,7 +44,7 @@ fn repl() {
 
     let mut lexer = Lexer::new();
     let mut parser = Parser::default();
-    let mut evaluator = Evaluator::default();
+    let evaluator = Evaluator::default();
 
     loop {
         match repl.readline(prompt) {
@@ -61,6 +61,9 @@ fn repl() {
                             }
                             Err(EvaluatorError::TooManyArguments) => {
                                 error_message(prompt.len() + 1, "Too Many Arguments");
+                            }
+                            Err(EvaluatorError::NegativeShift(position)) => {
+                                error_message(position + prompt.len() + 1, "Negative Shift");
                             }
                         }
                     }
