@@ -38,6 +38,11 @@ impl Evaluator {
 
             }
         }
+        if stack.len() == 1 {
+            result.push(stack.pop().unwrap().to_string());
+        } else {
+            return Err(EvaluatorError::TooManyArguments);
+        }
         Ok(result)
     }
 }

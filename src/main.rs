@@ -59,6 +59,9 @@ fn repl() {
                             Err(EvaluatorError::MissingArgument(position)) => {
                                 error_message(position + prompt.len() + 1, "Missing Argument");
                             }
+                            Err(EvaluatorError::TooManyArguments) => {
+                                error_message(prompt.len() + 1, "Too Many Arguments");
+                            }
                         }
                     }
                     Err(ParserError::RadixError(position)) => {

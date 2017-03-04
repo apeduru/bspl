@@ -10,4 +10,5 @@ pub enum ParserError {
 #[derive(Debug, PartialEq)]
 pub enum EvaluatorError {
     MissingArgument(usize),
+    TooManyArguments,
 }
