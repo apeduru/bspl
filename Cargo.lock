@@ -1,6 +1,6 @@
 [root]
 name = "bspl"
-version = "0.1.0"
+version = "0.9.0"
 dependencies = [
  "rustyline 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "tempfile 2.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
