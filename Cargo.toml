@@ -7,6 +7,8 @@ homepage = "https://github.com/apeduru/bspl.git"
 license = "MIT"
 readme = "README.md"
 description = "A REPL for pracitising bitwise operations"
+keywords=["education", "bitwise", "operations"]
+categories=["command-line-utilities", "command-line-interface"]
 
 exclude = [
     "debian/*",
