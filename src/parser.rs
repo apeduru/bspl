@@ -28,7 +28,6 @@ impl Parser {
         Parser { operators: Operators::new() }
     }
 
-
     fn lower_precedence(&self, new_token: &Token, top_token: &Token) -> bool {
         let &Operator(new_token_prec, ref new_token_assoc) = match *new_token {
             Token::Operator(ref new_token_name) => self.operators.get(&new_token_name).unwrap(),
@@ -83,19 +82,17 @@ impl Parser {
                         }
                     }
 
+                }
+                Token::CloseBracket => {
                     loop {
                         match stack.last() {
                             Some(&(_, Token::OpenBracket)) => {
-                                found = true;
                                 stack.pop();
                                 break;
                             }
-                            None => break,
+                            None => return Err(ParserError::MissingOpeningBracket(position)),
                             _ => output.push(stack.pop().unwrap()),
                         }
-                    }
-                    if !found {
-                        return Err(ParserError::MissingOpeningBracket(position));
                     }
                 }
                 Token::Unknown(_) => {
