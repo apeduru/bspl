@@ -2,6 +2,7 @@
 pub enum ParserError {
     RadixError(usize),
     UnknownOperator(usize),
+    InvalidSyntax(usize),
     MissingOpeningBracket(usize),
     MissingClosingBracket(usize),
 }

@@ -48,7 +48,7 @@ impl Parser {
         let mut stack = Tokens::new();
         let mut output = Tokens::new();
 
-        let mut token_iterator = tokens.iter();
+        let mut token_iterator = tokens.iter().peekable();
         while let Some(&(position, ref token)) = token_iterator.next() {
             match *token {
                 Token::Decimal(_) => output.push((position, token.clone())),
@@ -75,9 +75,13 @@ impl Parser {
 
                     stack.push((position, token.clone()));
                 }
-                Token::OpenBracket => stack.push((position, token.clone())),
-                Token::CloseBracket => {
-                    let mut found = false;
+                Token::OpenBracket => {
+                    stack.push((position, token.clone()));
+                    if let Some(&&(position, Token::Operator(ref op))) = token_iterator.peek() {
+                        if *op != Symbol::NOT {
+                            return Err(ParserError::InvalidSyntax(position));
+                        }
+                    }
 
                     loop {
                         match stack.last() {

@@ -73,6 +73,9 @@ fn repl() {
                     Err(ParserError::MissingClosingBracket(position)) => {
                         error_message(position + prompt.len() + 1, "Missing Closing Bracket");
                     }
+                    Err(ParserError::InvalidSyntax(position)) => {
+                        error_message(position + prompt.len() + 1, "Invalid Syntax");
+                    }
                 }
             }
             Err(ReadlineError::Eof) => break,
