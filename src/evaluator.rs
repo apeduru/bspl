@@ -16,6 +16,10 @@ impl Evaluator {
         let mut result: Vec<String> = Vec::with_capacity(3);
         let mut stack: Vec<i32> = Vec::with_capacity(3);
 
+        if tokens.is_empty() {
+            return Ok(result);
+        }
+
         for (position, ref token) in tokens {
             match *token {
                 Token::Decimal(ref dec) => {
