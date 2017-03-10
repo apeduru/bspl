@@ -21,14 +21,9 @@ And the equivalent using the Python REPL.
 
 `cargo install bspl`
 
-### Debian, Ubuntu
-
-
 ## Usage
 
-TODO: Explain allowable operators
-
-TODO: Examples
+Perform any operation using the following bitwise operators: ~ & | ^ << >>
 
 ## Design
 
@@ -40,8 +35,6 @@ See [REFERENCES.md](./REFERENCES.md).
 
 ## Roadmap
 
-Base Conversions
+Support for additional bases
 
 Add Octal to supported bases
-
-Unit tests lmao
