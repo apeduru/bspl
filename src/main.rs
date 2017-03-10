@@ -26,14 +26,18 @@ fn error_message(width: usize, msg: &'static str) {
     println!("{caret:>width$}\n.. {}", msg, caret = "^", width = width);
 }
 
-fn display_results(results: &Vec<String>) {
-    for result in results {
+fn display_results(results: Vec<String>) {
+    let mut result_iter = results.iter();
+    while let Some(result) = result_iter.next() {
         println!(".. {}", result);
     }
-    let final_result: i32 = results.last().unwrap().parse().unwrap();
-    println!(".. Dec: {}", final_result);
-    println!(".. Hex: 0x{:x}", final_result);
-    println!(".. Bin: 0b{:b}", final_result);
+
+    if let Some(final_result) = results.last() {
+        let parsed_final_result: i32 = final_result.parse().unwrap();
+        println!(".. Dec: {}", parsed_final_result);
+        println!(".. Hex: 0x{:x}", parsed_final_result);
+        println!(".. Bin: 0b{:b}", parsed_final_result);
+    }
 }
 
 fn repl() {
@@ -54,7 +58,7 @@ fn repl() {
                     Ok(parsed_tokens) => {
                         match evaluator.evaluate(parsed_tokens) {
                             Ok(result) => {
-                                display_results(&result);
+                                display_results(result);
                             }
                             Err(EvaluatorError::MissingArgument(position)) => {
                                 error_message(position + prompt.len() + 1, "Missing Argument");
