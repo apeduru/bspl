@@ -86,6 +86,8 @@ impl Evaluator {
         // The last element on the stack should be the final result
         if stack.len() != 1 {
             return Err(EvaluatorError::TooManyArguments);
+        } else if result.is_empty() {
+            result.push(stack.pop().unwrap().to_string());
         }
 
         Ok(result)
