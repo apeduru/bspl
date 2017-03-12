@@ -33,10 +33,13 @@ fn display_results(results: Vec<String>) {
     }
 
     if let Some(final_result) = results.last() {
-        let parsed_final_result: i32 = final_result.parse().unwrap();
-        println!(".. Dec: {}", parsed_final_result);
-        println!(".. Hex: 0x{:x}", parsed_final_result);
-        println!(".. Bin: 0b{:b}", parsed_final_result);
+        let parsed_final_result = final_result.parse::<i32>();
+        if parsed_final_result.is_ok() {
+            let parsed_final_result = parsed_final_result.unwrap();
+            println!(".. Dec: {}", parsed_final_result);
+            println!(".. Hex: 0x{:x}", parsed_final_result);
+            println!(".. Bin: 0b{:b}", parsed_final_result);
+        }
     }
 }
 
