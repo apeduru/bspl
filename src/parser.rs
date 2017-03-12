@@ -50,7 +50,8 @@ impl Parser {
         let mut token_iterator = tokens.iter().peekable();
         while let Some(&(position, ref token)) = token_iterator.next() {
             match *token {
-                Token::Decimal(_) => output.push((position, token.clone())),
+                Token::Decimal(_) |
+                Token::Variable(_) => output.push((position, token.clone())),
                 Token::Radix(_) => {
                     return Err(ParserError::RadixError(position));
                 }

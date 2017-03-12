@@ -20,6 +20,7 @@ use error::{ParserError, EvaluatorError};
 fn prelude() {
     println!("bspl {}", VERSION);
     println!("Bit-Shift-Print Loop");
+    println!("Type 'help', 'license', or 'version' for more information.");
 }
 
 fn error_message(width: usize, msg: &'static str) {
@@ -72,6 +73,13 @@ fn repl() {
                             Err(EvaluatorError::NegativeShift(position)) => {
                                 error_message(position + prompt.len() + 1, "Negative Shift");
                             }
+                            Err(EvaluatorError::KeywordError(position)) => {
+                                error_message(position + prompt.len() + 1, "Cannot use Keyword");
+                            }
+                            Err(EvaluatorError::UnknownKeyword(position)) => {
+                                error_message(position + prompt.len() + 1, "Unknown Keyword");
+                            }
+                            Err(EvaluatorError::Exit) => break,
                         }
                     }
                     Err(ParserError::RadixError(position)) => {
@@ -93,7 +101,7 @@ fn repl() {
             }
             Err(ReadlineError::Eof) => break,
             Err(ReadlineError::Interrupted) => {
-                println!("Press Ctrl-D to leave bspl");
+                println!("Type 'exit' or press Ctrl-D to leave bspl");
                 continue;
             }
             Err(err) => {

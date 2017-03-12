@@ -12,6 +12,7 @@ pub enum Symbol {
 pub enum Token {
     OpenBracket,
     CloseBracket,
+    Variable(String),
     Decimal(String), // Literal expression: 42
     Radix(String), // Non-Dec
     Operator(Symbol),
@@ -150,6 +151,8 @@ impl Lexer {
     fn identify_radix(&self, position: usize, tokens: &mut Tokens, radix: &mut String) {
         if !radix.parse::<i32>().is_err() {
             tokens.push((position, Token::Decimal(radix.clone())));
+        } else if radix.chars().all(|c| c.is_alphabetic()) {
+            tokens.push((position, Token::Variable(radix.clone())));
         } else {
             tokens.push((position, Token::Radix(radix.clone())));
         }

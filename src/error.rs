@@ -12,4 +12,7 @@ pub enum EvaluatorError {
     MissingArgument(usize),
     TooManyArguments,
     NegativeShift(usize),
+    KeywordError(usize),
+    UnknownKeyword(usize),
+    Exit,
 }
