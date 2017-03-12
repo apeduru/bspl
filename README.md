@@ -23,7 +23,7 @@ And the equivalent using the Python REPL.
 
 ## Usage
 
-Perform any operation using the following bitwise operators: ~ & | ^ << >>
+Start `bspl` then type `help` for more information.
 
 ## Design
 
