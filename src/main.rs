@@ -73,6 +73,9 @@ fn repl() {
                             Err(EvaluatorError::NegativeShift(position)) => {
                                 error_message(position + prompt.len() + 1, "Negative Shift");
                             }
+                            Err(EvaluatorError::OverflowShift(position)) => {
+                                error_message(position + prompt.len() + 1, "Overflow Shift");
+                            }
                             Err(EvaluatorError::KeywordError(position)) => {
                                 error_message(position + prompt.len() + 1, "Cannot use Keyword");
                             }
