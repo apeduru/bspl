@@ -1,6 +1,6 @@
 [package]
 name = "bspl"
-version = "0.9.0"
+version = "0.9.1"
 authors = ["Ansley Peduru <ansleypeduru96@gmail.com>"]
 repository = "https://github.com/apeduru/bspl.git"
 homepage = "https://github.com/apeduru/bspl.git"
