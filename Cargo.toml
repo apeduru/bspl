@@ -6,7 +6,7 @@ repository = "https://github.com/apeduru/bspl.git"
 homepage = "https://github.com/apeduru/bspl.git"
 license = "MIT"
 readme = "README.md"
-description = "A REPL for pracitising bitwise operations"
+description = "A REPL for practising bitwise operations"
 keywords=["education", "bitwise", "operations", "repl"]
 
 exclude = [
