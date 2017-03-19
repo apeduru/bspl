@@ -12,7 +12,7 @@ use rustyline::error::ReadlineError;
 use rustyline::Editor;
 use tempfile::NamedTempFile;
 use constants::VERSION;
-use lexer::Lexer;
+use lexer::lexer;
 use parser::Parser;
 use evaluator::Evaluator;
 use error::{ParserError, EvaluatorError};
@@ -50,7 +50,6 @@ fn repl() {
     let tmp_file = NamedTempFile::new().unwrap();
     let _ = repl.load_history(tmp_file.path());
 
-    let mut lexer = Lexer::new();
     let mut parser = Parser::default();
     let evaluator = Evaluator::default();
 
@@ -58,7 +57,7 @@ fn repl() {
         match repl.readline(prompt) {
             Ok(line) => {
                 repl.add_history_entry(&line);
-                match parser.parse(lexer.analyze(&line)) {
+                match parser.parse(lexer(&line)) {
                     Ok(parsed_tokens) => {
                         match evaluator.evaluate(parsed_tokens) {
                             Ok(result) => {

@@ -96,11 +96,7 @@ impl Parser {
                         }
                     }
                 }
-                Token::Unknown(_) => {
-                    return Err(ParserError::UnknownOperator(position));
-                }
-                _ => continue,
-
+                Token::Unknown(_) => return Err(ParserError::UnknownOperator(position)),
             }
         }
         loop {
