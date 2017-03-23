@@ -21,13 +21,13 @@ pub enum Token {
 
 pub type Tokens = Vec<(usize, Token)>;
 
-fn identify_radix(position: usize, radix: String, tokens: &mut Tokens) {
+fn identify_radix(radix: String) -> Token {
     if !radix.parse::<i32>().is_err() {
-        tokens.push((position, Token::Decimal(radix)));
+        return Token::Decimal(radix);
     } else if radix.chars().all(|c| c.is_alphabetic()) {
-        tokens.push((position, Token::Variable(radix)));
+        return Token::Variable(radix);
     } else {
-        tokens.push((position, Token::Radix(radix)));
+        return Token::Radix(radix);
     }
 }
 
@@ -79,7 +79,7 @@ pub fn lexer(line: &str) -> Tokens {
                     iterator.next();
                     radix.push(rx);
                 }
-                identify_radix(radix_position, radix, &mut tokens);
+                tokens.push((radix_position, identify_radix(radix)));
             }
             _ => tokens.push((position, Token::Unknown(character))),
         }
