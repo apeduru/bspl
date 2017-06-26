@@ -1,4 +1,4 @@
-pub const LICENSE: &'static str = "MIT License
+pub const LICENSE: &str = "MIT License
 
 Copyright (c) 2016 Ansley Peduru
 
@@ -20,9 +20,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.";
 
-pub const VERSION: &'static str = env!("CARGO_PKG_VERSION");
+pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
-pub const HELP: &'static str = "Welcome to bspl!
+pub const HELP: &str = "Welcome to bspl!
 
 bspl supports 32-bit operations.
 You may only use decimals in your operations.
@@ -31,4 +31,4 @@ Use the following bitwise operators: ~ | & ^ << >>
 Try out the following operation to get started.
 12 | (1 << 12)";
 
-pub const KEYWORDS: &'static [&'static str] = &["license", "exit", "help", "version"];
+pub const KEYWORDS: &[&str] = &["license", "exit", "help", "version"];
