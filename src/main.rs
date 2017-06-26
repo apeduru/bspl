@@ -47,6 +47,7 @@ fn display_results(results: Vec<String>) {
 fn repl() {
     let mut repl = Editor::<()>::new();
     let prompt = "=> ";
+    let prompt_len = prompt.len() + 1;
     let tmp_file = NamedTempFile::new().unwrap();
     let _ = repl.load_history(tmp_file.path());
 
@@ -64,40 +65,40 @@ fn repl() {
                                 display_results(result);
                             }
                             Err(EvaluatorError::MissingArgument(position)) => {
-                                error_message(position + prompt.len() + 1, "Missing Argument");
+                                error_message(position + prompt_len, "Missing Argument");
                             }
                             Err(EvaluatorError::TooManyArguments) => {
-                                error_message(prompt.len() + 1, "Too Many Arguments");
+                                error_message(prompt_len, "Too Many Arguments");
                             }
                             Err(EvaluatorError::NegativeShift(position)) => {
-                                error_message(position + prompt.len() + 1, "Negative Shift");
+                                error_message(position + prompt_len, "Negative Shift");
                             }
                             Err(EvaluatorError::OverflowShift(position)) => {
-                                error_message(position + prompt.len() + 1, "Overflow Shift");
+                                error_message(position + prompt_len, "Overflow Shift");
                             }
                             Err(EvaluatorError::KeywordError(position)) => {
-                                error_message(position + prompt.len() + 1, "Cannot use Keyword");
+                                error_message(position + prompt_len, "Cannot use Keyword");
                             }
                             Err(EvaluatorError::UnknownKeyword(position)) => {
-                                error_message(position + prompt.len() + 1, "Unknown Keyword");
+                                error_message(position + prompt_len, "Unknown Keyword");
                             }
                             Err(EvaluatorError::Exit) => break,
                         }
                     }
                     Err(ParserError::RadixError(position)) => {
-                        error_message(position + prompt.len() + 1, "Radix Error");
+                        error_message(position + prompt_len, "Radix Error");
                     }
                     Err(ParserError::UnknownOperator(position)) => {
-                        error_message(position + prompt.len() + 1, "Unknown Operator");
+                        error_message(position + prompt_len, "Unknown Operator");
                     }
                     Err(ParserError::MissingOpeningBracket(position)) => {
-                        error_message(position + prompt.len() + 1, "Missing Opening Bracket");
+                        error_message(position + prompt_len, "Missing Opening Bracket");
                     }
                     Err(ParserError::MissingClosingBracket(position)) => {
-                        error_message(position + prompt.len() + 1, "Missing Closing Bracket");
+                        error_message(position + prompt_len, "Missing Closing Bracket");
                     }
                     Err(ParserError::InvalidSyntax(position)) => {
-                        error_message(position + prompt.len() + 1, "Invalid Syntax");
+                        error_message(position + prompt_len, "Invalid Syntax");
                     }
                 }
             }
