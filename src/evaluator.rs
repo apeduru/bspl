@@ -13,7 +13,7 @@ impl Evaluator {
         Evaluator { functions: Functions::new() }
     }
 
-    fn is_keyword(&self, variable: &String) -> Option<&'static str> {
+    fn is_keyword(&self, variable: &String) -> Option<&str> {
         for keyword in KEYWORDS {
             if keyword.to_string() == variable.to_lowercase() {
                 return Some(keyword);

@@ -23,7 +23,7 @@ fn prelude() {
     println!("Type 'help', 'license', or 'version' for more information.");
 }
 
-fn error_message(width: usize, msg: &'static str) {
+fn error_message(width: usize, msg: &str) {
     println!("{caret:>width$}\n.. {}", msg, caret = "^", width = width);
 }
 
