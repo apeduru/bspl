@@ -11,7 +11,6 @@ pub enum ParserError {
 pub enum EvaluatorError {
     MissingArgument(usize),
     TooManyArguments,
-    NegativeShift(usize),
     OverflowShift(usize),
     KeywordError(usize),
     UnknownKeyword(usize),

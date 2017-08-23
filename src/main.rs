@@ -70,9 +70,6 @@ fn repl() {
                             Err(EvaluatorError::TooManyArguments) => {
                                 error_message(prompt_len, "Too Many Arguments");
                             }
-                            Err(EvaluatorError::NegativeShift(position)) => {
-                                error_message(position + prompt_len, "Negative Shift");
-                            }
                             Err(EvaluatorError::OverflowShift(position)) => {
                                 error_message(position + prompt_len, "Overflow Shift");
                             }

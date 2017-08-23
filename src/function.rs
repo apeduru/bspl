@@ -51,10 +51,6 @@ pub mod functions {
         let b = args.pop().unwrap();
         let a = args.pop().unwrap();
 
-        if b < 0 {
-            return Err(EvaluatorError::NegativeShift(_position));
-        }
-
         if let Some(c) = a.checked_shr(b as u32) {
             return Ok((c, format!("{} {} {}", a.to_string(), ">>".to_string(), b.to_string())));
         } else {
@@ -65,10 +61,6 @@ pub mod functions {
     pub fn lshift(mut args: Vec<u32>, _position: usize) -> Result<Operation, EvaluatorError> {
         let b = args.pop().unwrap();
         let a = args.pop().unwrap();
-
-        if b < 0 {
-            return Err(EvaluatorError::NegativeShift(_position));
-        }
 
         if let Some(c) = a.checked_shl(b as u32) {
             return Ok((c, format!("{} {} {}", a.to_string(), "<<".to_string(), b.to_string())));
