@@ -34,7 +34,7 @@ fn display_results(results: Vec<String>) {
     }
 
     if let Some(final_result) = results.last() {
-        let parsed_final_result = final_result.parse::<i32>();
+        let parsed_final_result = final_result.parse::<u32>();
         if parsed_final_result.is_ok() {
             let parsed_final_result = parsed_final_result.unwrap();
             println!(".. Dec: {}", parsed_final_result);

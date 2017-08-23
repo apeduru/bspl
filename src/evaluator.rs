@@ -2,6 +2,7 @@ use lexer::{Symbol, Token, Tokens};
 use function::{Function, Functions, functions};
 use error::EvaluatorError;
 use constants::{VERSION, KEYWORDS, HELP, LICENSE};
+use std::u32;
 
 
 pub struct Evaluator {
@@ -25,7 +26,7 @@ impl Evaluator {
 
     pub fn evaluate(&self, tokens: Tokens) -> Result<Vec<String>, EvaluatorError> {
         let mut result: Vec<String> = Vec::with_capacity(3);
-        let mut stack: Vec<i32> = Vec::with_capacity(3);
+        let mut stack: Vec<u32> = Vec::with_capacity(3);
         let num_tokens = tokens.len();
 
         if tokens.is_empty() {
@@ -38,7 +39,7 @@ impl Evaluator {
                     stack.push(dec.parse().unwrap());
                 }
                 Token::Hexadecimal(ref hex) => {
-                    stack.push(i32::from_str_radix(hex.as_str().split_at(2).1, 16).unwrap());
+                    stack.push(u32::from_str_radix(hex.as_str().split_at(2).1, 16).unwrap());
                 }
                 Token::Variable(ref var) => {
                     if let Some(kw) = self.is_keyword(var) {
@@ -72,7 +73,7 @@ impl Evaluator {
                     let function = self.functions.get(&op).unwrap();
                     if stack.len() >= function.arity {
                         let stack_len = stack.len();
-                        let args: Vec<i32> = stack.split_off(stack_len - function.arity);
+                        let args: Vec<u32> = stack.split_off(stack_len - function.arity);
                         let interm_result = try!((function.handle)(args, position));
                         stack.push(interm_result.0);
                         result.push(interm_result.1);

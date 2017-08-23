@@ -24,8 +24,7 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 pub const HELP: &str = "Welcome to bspl!
 
-bspl supports 32-bit operations.
-You may only use decimals in your operations.
+bspl supports unsigned 32-bit integer operations.
 Use the following bitwise operators: ~ | & ^ << >>
 
 Try out the following operation to get started.

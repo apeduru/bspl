@@ -1,4 +1,4 @@
-use std::i32;
+use std::u32;
 
 #[derive(Debug, Eq, Hash, PartialEq, Clone)]
 pub enum Symbol {
@@ -73,10 +73,10 @@ pub fn lexer(line: &str) -> Tokens {
                     radix.push(rx);
                 }
 
-                if !radix.parse::<i32>().is_err() {
+                if !radix.parse::<u32>().is_err() {
                     tokens.push((radix_position, Token::Decimal(radix)));
                 } else if radix.as_str().starts_with("0x") &&
-                          i32::from_str_radix(radix.as_str().split_at(2).1, 16).is_ok() {
+                          u32::from_str_radix(radix.as_str().split_at(2).1, 16).is_ok() {
                     tokens.push((radix_position, Token::Hexadecimal(radix)));
                 } else if radix.chars().all(|c| c.is_alphabetic()) {
                     tokens.push((radix_position, Token::Variable(radix)));
