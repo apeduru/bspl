@@ -37,6 +37,9 @@ impl Evaluator {
                 Token::Decimal(ref dec) => {
                     stack.push(dec.parse().unwrap());
                 }
+                Token::Hexadecimal(ref hex) => {
+                    stack.push(i32::from_str_radix(hex.as_str().split_at(2).1, 16).unwrap());
+                }
                 Token::Variable(ref var) => {
                     if let Some(kw) = self.is_keyword(var) {
                         if num_tokens == 1 {

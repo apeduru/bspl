@@ -51,6 +51,7 @@ impl Parser {
         while let Some(&(position, ref token)) = token_iterator.next() {
             match *token {
                 Token::Decimal(_) |
+                Token::Hexadecimal(_) |
                 Token::Variable(_) => output.push((position, token.clone())),
                 Token::Radix(_) => {
                     return Err(ParserError::RadixError(position));

@@ -1,3 +1,5 @@
+use std::i32;
+
 #[derive(Debug, Eq, Hash, PartialEq, Clone)]
 pub enum Symbol {
     OR,
@@ -13,23 +15,14 @@ pub enum Token {
     OpenBracket,
     CloseBracket,
     Variable(String),
-    Decimal(String), // Literal expression: 42
-    Radix(String), // Non-Dec
+    Decimal(String), // 42
+    Hexadecimal(String), // 0x2a
+    Radix(String), // Non-{Dec, Hex}
     Operator(Symbol),
     Unknown(char),
 }
 
 pub type Tokens = Vec<(usize, Token)>;
-
-fn identify_radix(radix: String) -> Token {
-    if !radix.parse::<i32>().is_err() {
-        return Token::Decimal(radix);
-    } else if radix.chars().all(|c| c.is_alphabetic()) {
-        return Token::Variable(radix);
-    } else {
-        return Token::Radix(radix);
-    }
-}
 
 pub fn lexer(line: &str) -> Tokens {
     let mut tokens = Tokens::new();
@@ -79,7 +72,17 @@ pub fn lexer(line: &str) -> Tokens {
                     iterator.next();
                     radix.push(rx);
                 }
-                tokens.push((radix_position, identify_radix(radix)));
+
+                if !radix.parse::<i32>().is_err() {
+                    tokens.push((radix_position, Token::Decimal(radix)));
+                } else if radix.as_str().starts_with("0x") &&
+                          i32::from_str_radix(radix.as_str().split_at(2).1, 16).is_ok() {
+                    tokens.push((radix_position, Token::Hexadecimal(radix)));
+                } else if radix.chars().all(|c| c.is_alphabetic()) {
+                    tokens.push((radix_position, Token::Variable(radix)));
+                } else {
+                    tokens.push((radix_position, Token::Radix(radix)));
+                }
             }
             _ => tokens.push((position, Token::Unknown(character))),
         }
