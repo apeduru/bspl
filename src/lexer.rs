@@ -18,7 +18,6 @@ pub enum Token {
     Variable(String),
     Decimal(String), // 42
     Hexadecimal(String), // 0x2a
-    Radix(String), // Non-{Dec, Hex}
     Operator(Symbol),
 }
 
@@ -81,7 +80,7 @@ pub fn lexer(line: &str) -> Result<Tokens, LexerError> {
                 } else if radix.chars().all(|c| c.is_alphabetic()) {
                     tokens.push((radix_position, Token::Variable(radix)));
                 } else {
-                    tokens.push((radix_position, Token::Radix(radix)));
+                    return Err(LexerError::RadixError(position));
                 }
             }
             _ => return Err(LexerError::UnknownOperator(position)),

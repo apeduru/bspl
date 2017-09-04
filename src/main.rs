@@ -84,9 +84,6 @@ fn repl() {
                                     Err(EvaluatorError::Exit) => break,
                                 }
                             }
-                            Err(ParserError::RadixError(position)) => {
-                                error_message(position + prompt_len, "Radix Error");
-                            }
                             Err(ParserError::MissingOpeningBracket(position)) => {
                                 error_message(position + prompt_len, "Missing Opening Bracket");
                             }
@@ -97,6 +94,9 @@ fn repl() {
                                 error_message(position + prompt_len, "Invalid Syntax");
                             }
                         }
+                    }
+                    Err(LexerError::RadixError(position)) => {
+                        error_message(position + prompt_len, "Radix Error");
                     }
                     Err(LexerError::UnknownOperator(position)) => {
                         error_message(position + prompt_len, "Unknown Operator");

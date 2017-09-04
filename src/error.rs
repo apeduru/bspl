@@ -1,11 +1,11 @@
 #[derive(Debug, PartialEq)]
 pub enum LexerError {
     UnknownOperator(usize),
+    RadixError(usize),
 }
 
 #[derive(Debug, PartialEq)]
 pub enum ParserError {
-    RadixError(usize),
     InvalidSyntax(usize),
     MissingOpeningBracket(usize),
     MissingClosingBracket(usize),
