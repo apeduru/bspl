@@ -15,7 +15,7 @@ pub enum Symbol {
 pub enum Token {
     OpenBracket,
     CloseBracket,
-    Variable(String),
+    Keyword(String),
     Decimal(String), // 42
     Hexadecimal(String), // 0x2a
     Operator(Symbol),
@@ -78,7 +78,7 @@ pub fn lexer(line: &str) -> Result<Tokens, LexerError> {
                           u32::from_str_radix(radix.as_str().split_at(2).1, 16).is_ok() {
                     tokens.push((radix_position, Token::Hexadecimal(radix)));
                 } else if radix.chars().all(|c| c.is_alphabetic()) {
-                    tokens.push((radix_position, Token::Variable(radix)));
+                    tokens.push((radix_position, Token::Keyword(radix)));
                 } else {
                     return Err(LexerError::RadixError(position));
                 }

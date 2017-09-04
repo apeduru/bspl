@@ -52,7 +52,7 @@ impl Parser {
             match *token {
                 Token::Decimal(_) |
                 Token::Hexadecimal(_) |
-                Token::Variable(_) => output.push((position, token.clone())),
+                Token::Keyword(_) => output.push((position, token.clone())),
                 Token::Operator(_) => {
                     loop {
                         match stack.last() {

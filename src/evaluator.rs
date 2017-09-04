@@ -41,10 +41,10 @@ impl Evaluator {
                 Token::Hexadecimal(ref hex) => {
                     stack.push(u32::from_str_radix(hex.as_str().split_at(2).1, 16).unwrap());
                 }
-                Token::Variable(ref var) => {
-                    if let Some(kw) = self.is_keyword(var) {
+                Token::Keyword(ref kw) => {
+                    if let Some(keyword) = self.is_keyword(kw) {
                         if num_tokens == 1 {
-                            match kw {
+                            match keyword {
                                 "version" => result.push(VERSION.to_string()),
                                 "help" => {
                                     let mut h = HELP.lines()
