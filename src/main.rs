@@ -15,7 +15,7 @@ use constants::VERSION;
 use lexer::lexer;
 use parser::Parser;
 use evaluator::Evaluator;
-use error::{ParserError, EvaluatorError};
+use error::{LexerError, ParserError, EvaluatorError};
 
 fn prelude() {
     println!("bspl {}", VERSION);
@@ -58,44 +58,48 @@ fn repl() {
         match repl.readline(prompt) {
             Ok(line) => {
                 repl.add_history_entry(&line);
-                match parser.parse(lexer(&line)) {
-                    Ok(parsed_tokens) => {
-                        match evaluator.evaluate(parsed_tokens) {
-                            Ok(result) => {
-                                display_results(result);
+                match lexer(&line) {
+                    Ok(tokens) => {
+                        match parser.parse(tokens) {
+                            Ok(parsed_tokens) => {
+                                match evaluator.evaluate(parsed_tokens) {
+                                    Ok(result) => {
+                                        display_results(result);
+                                    }
+                                    Err(EvaluatorError::MissingArgument(position)) => {
+                                        error_message(position + prompt_len, "Missing Argument");
+                                    }
+                                    Err(EvaluatorError::TooManyArguments) => {
+                                        error_message(prompt_len, "Too Many Arguments");
+                                    }
+                                    Err(EvaluatorError::OverflowShift(position)) => {
+                                        error_message(position + prompt_len, "Overflow Shift");
+                                    }
+                                    Err(EvaluatorError::KeywordError(position)) => {
+                                        error_message(position + prompt_len, "Cannot use Keyword");
+                                    }
+                                    Err(EvaluatorError::UnknownKeyword(position)) => {
+                                        error_message(position + prompt_len, "Unknown Keyword");
+                                    }
+                                    Err(EvaluatorError::Exit) => break,
+                                }
                             }
-                            Err(EvaluatorError::MissingArgument(position)) => {
-                                error_message(position + prompt_len, "Missing Argument");
+                            Err(ParserError::RadixError(position)) => {
+                                error_message(position + prompt_len, "Radix Error");
                             }
-                            Err(EvaluatorError::TooManyArguments) => {
-                                error_message(prompt_len, "Too Many Arguments");
+                            Err(ParserError::MissingOpeningBracket(position)) => {
+                                error_message(position + prompt_len, "Missing Opening Bracket");
                             }
-                            Err(EvaluatorError::OverflowShift(position)) => {
-                                error_message(position + prompt_len, "Overflow Shift");
+                            Err(ParserError::MissingClosingBracket(position)) => {
+                                error_message(position + prompt_len, "Missing Closing Bracket");
                             }
-                            Err(EvaluatorError::KeywordError(position)) => {
-                                error_message(position + prompt_len, "Cannot use Keyword");
+                            Err(ParserError::InvalidSyntax(position)) => {
+                                error_message(position + prompt_len, "Invalid Syntax");
                             }
-                            Err(EvaluatorError::UnknownKeyword(position)) => {
-                                error_message(position + prompt_len, "Unknown Keyword");
-                            }
-                            Err(EvaluatorError::Exit) => break,
                         }
                     }
-                    Err(ParserError::RadixError(position)) => {
-                        error_message(position + prompt_len, "Radix Error");
-                    }
-                    Err(ParserError::UnknownOperator(position)) => {
+                    Err(LexerError::UnknownOperator(position)) => {
                         error_message(position + prompt_len, "Unknown Operator");
-                    }
-                    Err(ParserError::MissingOpeningBracket(position)) => {
-                        error_message(position + prompt_len, "Missing Opening Bracket");
-                    }
-                    Err(ParserError::MissingClosingBracket(position)) => {
-                        error_message(position + prompt_len, "Missing Closing Bracket");
-                    }
-                    Err(ParserError::InvalidSyntax(position)) => {
-                        error_message(position + prompt_len, "Invalid Syntax");
                     }
                 }
             }

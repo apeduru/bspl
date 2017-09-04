@@ -56,11 +56,7 @@ impl Parser {
                 Token::Radix(_) => {
                     return Err(ParserError::RadixError(position));
                 }
-                Token::Operator(ref name) => {
-                    if !self.operators.contains_key(&name) {
-                        return Err(ParserError::UnknownOperator(position));
-                    }
-
+                Token::Operator(_) => {
                     loop {
                         match stack.last() {
                             Some(&(_, Token::Operator(_))) => {
@@ -97,7 +93,6 @@ impl Parser {
                         }
                     }
                 }
-                Token::Unknown(_) => return Err(ParserError::UnknownOperator(position)),
             }
         }
         loop {

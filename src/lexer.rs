@@ -1,4 +1,5 @@
 use std::u32;
+use error::LexerError;
 
 #[derive(Debug, Eq, Hash, PartialEq, Clone)]
 pub enum Symbol {
@@ -19,12 +20,11 @@ pub enum Token {
     Hexadecimal(String), // 0x2a
     Radix(String), // Non-{Dec, Hex}
     Operator(Symbol),
-    Unknown(char),
 }
 
 pub type Tokens = Vec<(usize, Token)>;
 
-pub fn lexer(line: &str) -> Tokens {
+pub fn lexer(line: &str) -> Result<Tokens, LexerError> {
     let mut tokens = Tokens::new();
 
     let mut iterator = line.chars().enumerate().peekable();
@@ -47,7 +47,7 @@ pub fn lexer(line: &str) -> Tokens {
                         iterator.next();
                         tokens.push((shift_position, Token::Operator(Symbol::RSHIFT)));
                     }
-                    _ => tokens.push((shift_position, Token::Unknown(character))),
+                    _ => return Err(LexerError::UnknownOperator(position)),
                 }
             }
             '<' => {
@@ -57,7 +57,7 @@ pub fn lexer(line: &str) -> Tokens {
                         iterator.next();
                         tokens.push((shift_position, Token::Operator(Symbol::LSHIFT)));
                     }
-                    _ => tokens.push((shift_position, Token::Unknown(character))),
+                    _ => return Err(LexerError::UnknownOperator(position)),
                 }
             }
 
@@ -84,9 +84,9 @@ pub fn lexer(line: &str) -> Tokens {
                     tokens.push((radix_position, Token::Radix(radix)));
                 }
             }
-            _ => tokens.push((position, Token::Unknown(character))),
+            _ => return Err(LexerError::UnknownOperator(position)),
         }
     }
 
-    tokens
+    Ok(tokens)
 }

@@ -27,7 +27,7 @@ pub const HELP: &str = "Welcome to bspl!
 bspl supports unsigned 32-bit integer operations.
 Use the following bitwise operators: ~ | & ^ << >>
 
-Try out the following operation to get started.
+Try out the following expression to get started.
 12 | (1 << 12)";
 
 pub const KEYWORDS: &[&str] = &["license", "exit", "help", "version"];
