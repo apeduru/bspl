@@ -37,9 +37,9 @@ fn display_results(results: Vec<String>) {
         let parsed_final_result = final_result.parse::<u32>();
         if parsed_final_result.is_ok() {
             let parsed_final_result = parsed_final_result.unwrap();
-            println!(".. Dec: {}", parsed_final_result);
-            println!(".. Hex: 0x{:x}", parsed_final_result);
-            println!(".. Bin: 0b{:b}", parsed_final_result);
+            println!("D: {}", parsed_final_result);
+            println!("H: {:#x}", parsed_final_result);
+            println!("B: {:#b}", parsed_final_result);
         }
     }
 }
@@ -67,39 +67,45 @@ fn repl() {
                                         display_results(result);
                                     }
                                     Err(EvaluatorError::MissingArgument(position)) => {
-                                        error_message(position + prompt_len, "Missing Argument");
+                                        error_message(position + prompt_len,
+                                                      "Missing argument from expression");
                                     }
                                     Err(EvaluatorError::TooManyArguments) => {
-                                        error_message(prompt_len, "Too Many Arguments");
+                                        error_message(prompt_len,
+                                                      "Too many arguments in expression");
                                     }
                                     Err(EvaluatorError::OverflowShift(position)) => {
-                                        error_message(position + prompt_len, "Overflow Shift");
+                                        error_message(position + prompt_len,
+                                                      "Shift overflow error");
                                     }
                                     Err(EvaluatorError::KeywordError(position)) => {
-                                        error_message(position + prompt_len, "Cannot use Keyword");
+                                        error_message(position + prompt_len,
+                                                      "Cannot use keyword in expression");
                                     }
                                     Err(EvaluatorError::UnknownKeyword(position)) => {
-                                        error_message(position + prompt_len, "Unknown Keyword");
+                                        error_message(position + prompt_len, "Not a valid keyword");
                                     }
                                     Err(EvaluatorError::Exit) => break,
                                 }
                             }
                             Err(ParserError::MissingOpeningBracket(position)) => {
-                                error_message(position + prompt_len, "Missing Opening Bracket");
+                                error_message(position + prompt_len, "Missing an opening bracket");
                             }
                             Err(ParserError::MissingClosingBracket(position)) => {
-                                error_message(position + prompt_len, "Missing Closing Bracket");
+                                error_message(position + prompt_len, "Missing a closing bracket");
                             }
                             Err(ParserError::InvalidSyntax(position)) => {
-                                error_message(position + prompt_len, "Invalid Syntax");
+                                error_message(position + prompt_len,
+                                              "Expression contains invalid syntax");
                             }
                         }
                     }
                     Err(LexerError::RadixError(position)) => {
-                        error_message(position + prompt_len, "Radix Error");
+                        error_message(position + prompt_len,
+                                      "Not a recognizable decimal, hexadecimal, or keyword");
                     }
                     Err(LexerError::UnknownOperator(position)) => {
-                        error_message(position + prompt_len, "Unknown Operator");
+                        error_message(position + prompt_len, "Not a valid operator");
                     }
                 }
             }
