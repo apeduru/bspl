@@ -27,7 +27,6 @@ impl Evaluator {
     pub fn evaluate(&self, tokens: Tokens) -> Result<Vec<String>, EvaluatorError> {
         let mut result: Vec<String> = Vec::with_capacity(3);
         let mut stack: Vec<u32> = Vec::with_capacity(3);
-        let num_tokens = tokens.len();
 
         if tokens.is_empty() {
             return Ok(result);
@@ -43,28 +42,24 @@ impl Evaluator {
                 }
                 Token::Keyword(ref kw) => {
                     if let Some(keyword) = self.is_keyword(kw) {
-                        if num_tokens == 1 {
-                            match keyword {
-                                "version" => result.push(VERSION.to_string()),
-                                "help" => {
-                                    let mut h = HELP.lines()
-                                        .map(|line| line.to_string())
-                                        .collect();
-                                    result.append(&mut h);
-                                }
-                                "license" => {
-                                    let mut l = LICENSE.lines()
-                                        .map(|line| line.to_string())
-                                        .collect();
-                                    result.append(&mut l);
-                                }
-                                "exit" => return Err(EvaluatorError::Exit),
-                                _ => unreachable!(),
+                        match keyword {
+                            "version" => result.push(VERSION.to_string()),
+                            "help" => {
+                                let mut h = HELP.lines()
+                                    .map(|line| line.to_string())
+                                    .collect();
+                                result.append(&mut h);
                             }
-                            return Ok(result);
-                        } else {
-                            return Err(EvaluatorError::KeywordError(position));
+                            "license" => {
+                                let mut l = LICENSE.lines()
+                                    .map(|line| line.to_string())
+                                    .collect();
+                                result.append(&mut l);
+                            }
+                            "exit" => return Err(EvaluatorError::Exit),
+                            _ => unreachable!(),
                         }
+                        return Ok(result);
                     } else {
                         return Err(EvaluatorError::UnknownKeyword(position));
                     }

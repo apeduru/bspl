@@ -78,10 +78,6 @@ fn repl() {
                                         error_message(position + prompt_len,
                                                       "Shift overflow error");
                                     }
-                                    Err(EvaluatorError::KeywordError(position)) => {
-                                        error_message(position + prompt_len,
-                                                      "Cannot use keyword in expression");
-                                    }
                                     Err(EvaluatorError::UnknownKeyword(position)) => {
                                         error_message(position + prompt_len, "Not a valid keyword");
                                     }

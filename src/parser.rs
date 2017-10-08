@@ -46,13 +46,20 @@ impl Parser {
     pub fn parse(&mut self, tokens: Tokens) -> Result<Tokens, ParserError> {
         let mut stack = Tokens::new();
         let mut output = Tokens::new();
+        let num_tokens = tokens.len();
 
         let mut token_iterator = tokens.iter().peekable();
         while let Some(&(position, ref token)) = token_iterator.next() {
             match *token {
                 Token::Decimal(_) |
-                Token::Hexadecimal(_) |
-                Token::Keyword(_) => output.push((position, token.clone())),
+                Token::Hexadecimal(_) => output.push((position, token.clone())),
+                Token::Keyword(_) =>  {
+                    if num_tokens == 1 {
+                        output.push((position, token.clone()));
+                    } else {
+                        return Err(ParserError::KeywordError(position));
+                    }
+                }
                 Token::Operator(_) => {
                     loop {
                         match stack.last() {

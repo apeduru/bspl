@@ -8,6 +8,7 @@ pub enum LexerError {
 pub enum ParserError {
     MissingOpeningBracket(usize),
     MissingClosingBracket(usize),
+    KeywordError(usize),
 }
 
 #[derive(Debug, PartialEq)]
@@ -15,7 +16,6 @@ pub enum EvaluatorError {
     MissingArgument(usize),
     TooManyArguments,
     OverflowShift(usize),
-    KeywordError(usize),
     UnknownKeyword(usize),
     Exit,
 }
