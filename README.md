@@ -10,6 +10,7 @@ Born out of frustration while completing labs for my undergrad operating systems
 course, I wanted a tool for quickly prototyping and tracing complex bitwise operations.
 
 ![bspl](https://raw.githubusercontent.com/apeduru/bspl/master/pics/bspl_screenshot.png)
+
 And the equivalent using the Python REPL.
 
 ![Python](https://raw.githubusercontent.com/apeduru/bspl/master/pics/python_screenshot.png)
