@@ -94,9 +94,9 @@ fn repl() {
                             Err(ParserError::MissingClosingBracket(position)) => {
                                 error_message(position + prompt_len, "Missing a closing bracket");
                             }
-                            Err(ParserError::InvalidSyntax(position)) => {
+                            Err(ParserError::KeywordError(position)) => {
                                 error_message(position + prompt_len,
-                                              "Expression contains invalid syntax");
+                                              "Cannot use keyword in expression");
                             }
                         }
                     }

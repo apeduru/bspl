@@ -6,7 +6,6 @@ pub enum LexerError {
 
 #[derive(Debug, PartialEq)]
 pub enum ParserError {
-    InvalidSyntax(usize),
     MissingOpeningBracket(usize),
     MissingClosingBracket(usize),
 }

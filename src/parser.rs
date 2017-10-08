@@ -71,12 +71,6 @@ impl Parser {
                 }
                 Token::OpenBracket => {
                     stack.push((position, token.clone()));
-                    if let Some(&&(position, Token::Operator(ref op))) = token_iterator.peek() {
-                        if *op != Symbol::NOT {
-                            return Err(ParserError::InvalidSyntax(position));
-                        }
-                    }
-
                 }
                 Token::CloseBracket => {
                     loop {
