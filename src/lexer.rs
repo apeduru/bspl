@@ -72,7 +72,7 @@ pub fn lexer(line: &str) -> Result<Tokens, LexerError> {
                     radix.push(rx);
                 }
 
-                if !radix.parse::<u32>().is_err() {
+                if radix.parse::<u32>().is_ok() {
                     tokens.push((radix_position, Token::Decimal(radix)));
                 } else if radix.as_str().starts_with("0x") &&
                           u32::from_str_radix(radix.as_str().split_at(2).1, 16).is_ok() {
