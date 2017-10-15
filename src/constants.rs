@@ -24,8 +24,11 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 pub const HELP: &str = "Welcome to bspl!
 
-bspl supports unsigned 32-bit integer operations.
-Use the following bitwise operators: ~ | & ^ << >>
+bspl is a REPL for practising bitwise operations.
+
+bspl does unsigned 32-bit integer operations
+using either decimal or hexadecimal operands,
+and the following bitwise operators: ~ | & ^ << >>
 
 Try out the following expression to get started.
 12 | (1 << 12)";
