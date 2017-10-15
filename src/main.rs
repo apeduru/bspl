@@ -98,7 +98,7 @@ fn repl() {
                     }
                     Err(LexerError::RadixError(position)) => {
                         error_message(position + prompt_len,
-                                      "Not a recognizable decimal, hexadecimal, or keyword");
+                                      "Not a valid decimal, hexadecimal, or keyword");
                     }
                     Err(LexerError::UnknownOperator(position)) => {
                         error_message(position + prompt_len, "Not a valid operator");
