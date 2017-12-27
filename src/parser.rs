@@ -85,8 +85,8 @@ impl Parser {
                                 stack.pop();
                                 break;
                             }
+                            Some(_) => output.push(stack.pop().unwrap()),
                             None => return Err(ParserError::MissingOpeningBracket(position)),
-                            _ => output.push(stack.pop().unwrap()),
                         }
                     }
                 }
