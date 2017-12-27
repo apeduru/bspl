@@ -32,8 +32,8 @@ impl Evaluator {
             return Ok(result);
         }
 
-        for (position, ref token) in tokens {
-            match *token {
+        for (position, token) in tokens {
+            match token {
                 Token::Decimal(ref dec) => {
                     stack.push(dec.parse().unwrap());
                 }

@@ -47,7 +47,7 @@ fn repl() {
     let tmp_file = NamedTempFile::new().unwrap();
     let _ = repl.load_history(tmp_file.path());
 
-    let mut parser = Parser::default();
+    let parser = Parser::default();
     let evaluator = Evaluator::default();
 
     loop {
