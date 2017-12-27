@@ -43,7 +43,7 @@ impl Parser {
         (*new_token_assoc == Associativity::RightToLeft && new_token_prec >= top_token_prec)
     }
 
-    pub fn parse(&mut self, tokens: Tokens) -> Result<Tokens, ParserError> {
+    pub fn parse(&self, tokens: Tokens) -> Result<Tokens, ParserError> {
         let mut stack = Tokens::new();
         let mut output = Tokens::new();
 
