@@ -28,19 +28,15 @@ fn error_message(width: usize, msg: &str) {
 }
 
 fn display_results(results: Vec<String>) {
-    let mut result_iter = results.iter();
-    while let Some(result) = result_iter.next() {
-        println!(".. {}", result);
-    }
-
-    if let Some(final_result) = results.last() {
-        let parsed_final_result = final_result.parse::<u32>();
-        if parsed_final_result.is_ok() {
-            let parsed_final_result = parsed_final_result.unwrap();
-            println!("D: {}", parsed_final_result);
-            println!("H: {:#x}", parsed_final_result);
-            println!("B: {:#b}", parsed_final_result);
+    if let Some((final_result, results)) = results.split_last(){
+        for result in results {
+            println!(".. {}", result);
         }
+
+        let parsed_final_result = final_result.parse::<u32>().unwrap();
+        println!("D: {}", parsed_final_result);
+        println!("H: {:#x}", parsed_final_result);
+        println!("B: {:#b}", parsed_final_result);
     }
 }
 
