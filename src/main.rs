@@ -33,10 +33,13 @@ fn display_results(results: Vec<String>) {
             println!(".. {}", result);
         }
 
-        let parsed_final_result = final_result.parse::<u32>().unwrap();
-        println!("D: {}", parsed_final_result);
-        println!("H: {:#x}", parsed_final_result);
-        println!("B: {:#b}", parsed_final_result);
+        if let Ok(parsed_final_result) = final_result.parse::<u32>(){
+            println!("D: {}", parsed_final_result);
+            println!("H: {:#x}", parsed_final_result);
+            println!("B: {:#b}", parsed_final_result);
+        } else {
+            println!(".. {}", final_result);
+        }
     }
 }
 
