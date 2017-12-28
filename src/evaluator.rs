@@ -60,16 +60,15 @@ impl Evaluator {
                 }
                 Token::Operator(ref op) => {
                     let function = self.functions.get(&op).unwrap();
-                    if stack.len() >= function.arity {
-                        let stack_len = stack.len();
-                        let args: Vec<u32> = stack.split_off(stack_len - function.arity);
-                        let interm_result = try!((function.handle)(args, position));
-                        stack.push(interm_result.0);
-                        result.push(interm_result.1);
-                        result.push(interm_result.0.to_string());
-                    } else {
+                    if stack.len() < function.arity {
                         return Err(EvaluatorError::MissingArgument(position));
                     }
+                    let stack_len = stack.len();
+                    let args: Vec<u32> = stack.split_off(stack_len - function.arity);
+                    let interm_result = try!((function.handle)(args, position));
+                    stack.push(interm_result.0);
+                    result.push(interm_result.1);
+                    result.push(interm_result.0.to_string());
                 }
                 _ => continue,
 
