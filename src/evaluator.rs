@@ -45,16 +45,10 @@ impl Evaluator {
                         match keyword {
                             "version" => result.push(VERSION.to_string()),
                             "help" => {
-                                let mut h = HELP.lines()
-                                    .map(|line| line.to_string())
-                                    .collect();
-                                result.append(&mut h);
+                                result = HELP.lines().map(|line| line.to_string()).collect();
                             }
                             "license" => {
-                                let mut l = LICENSE.lines()
-                                    .map(|line| line.to_string())
-                                    .collect();
-                                result.append(&mut l);
+                                result = LICENSE.lines().map(|line| line.to_string()).collect();
                             }
                             "exit" => return Err(EvaluatorError::Exit),
                             _ => unreachable!(),
