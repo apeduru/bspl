@@ -25,8 +25,8 @@ impl Evaluator {
     }
 
     pub fn evaluate(&self, tokens: Tokens) -> Result<Vec<String>, EvaluatorError> {
-        let mut result: Vec<String> = Vec::with_capacity(3);
-        let mut stack: Vec<u32> = Vec::with_capacity(3);
+        let mut result: Vec<String> = Vec::new();
+        let mut stack: Vec<u32> = Vec::new();
 
         if tokens.is_empty() {
             return Ok(result);
