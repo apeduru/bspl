@@ -70,7 +70,7 @@ impl Evaluator {
                     result.push(interm_result.1);
                     result.push(interm_result.0.to_string());
                 }
-                _ => continue,
+                _ => unreachable!(),
 
             }
         }
