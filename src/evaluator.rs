@@ -9,19 +9,19 @@ pub struct Evaluator {
     functions: Functions,
 }
 
+fn is_keyword(variable: &String) -> Option<&str> {
+    for keyword in KEYWORDS {
+        if keyword.to_string() == variable.to_lowercase() {
+            return Some(keyword);
+        }
+    }
+
+    None
+}
+
 impl Evaluator {
     pub fn new() -> Evaluator {
         Evaluator { functions: Functions::new() }
-    }
-
-    fn is_keyword(&self, variable: &String) -> Option<&str> {
-        for keyword in KEYWORDS {
-            if keyword.to_string() == variable.to_lowercase() {
-                return Some(keyword);
-            }
-        }
-
-        None
     }
 
     pub fn evaluate(&self, tokens: Tokens) -> Result<Vec<String>, EvaluatorError> {
@@ -41,7 +41,7 @@ impl Evaluator {
                     stack.push(u32::from_str_radix(hex.as_str().split_at(2).1, 16).unwrap());
                 }
                 Token::Keyword(ref kw) => {
-                    if let Some(keyword) = self.is_keyword(kw) {
+                    if let Some(keyword) = is_keyword(kw) {
                         match keyword {
                             "version" => result.push(VERSION.to_string()),
                             "help" => {
