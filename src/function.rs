@@ -32,19 +32,28 @@ pub mod functions {
     pub fn and(mut args: Vec<u32>, _position: usize) -> Result<Operation, EvaluatorError> {
         let b = args.pop().unwrap();
         let a = args.pop().unwrap();
-        Ok((a & b, format!("{} {} {}", a.to_string(), "&".to_string(), b.to_string())))
+        Ok((
+            a & b,
+            format!("{} {} {}", a.to_string(), "&".to_string(), b.to_string()),
+        ))
     }
 
     pub fn or(mut args: Vec<u32>, _position: usize) -> Result<Operation, EvaluatorError> {
         let b = args.pop().unwrap();
         let a = args.pop().unwrap();
-        Ok((a | b, format!("{} {} {}", a.to_string(), "|".to_string(), b.to_string())))
+        Ok((
+            a | b,
+            format!("{} {} {}", a.to_string(), "|".to_string(), b.to_string()),
+        ))
     }
 
     pub fn xor(mut args: Vec<u32>, _position: usize) -> Result<Operation, EvaluatorError> {
         let b = args.pop().unwrap();
         let a = args.pop().unwrap();
-        Ok((a ^ b, format!("{} {} {}", a.to_string(), "^".to_string(), b.to_string())))
+        Ok((
+            a ^ b,
+            format!("{} {} {}", a.to_string(), "^".to_string(), b.to_string()),
+        ))
     }
 
     pub fn rshift(mut args: Vec<u32>, _position: usize) -> Result<Operation, EvaluatorError> {
@@ -52,7 +61,10 @@ pub mod functions {
         let a = args.pop().unwrap();
 
         if let Some(c) = a.checked_shr(b as u32) {
-            return Ok((c, format!("{} {} {}", a.to_string(), ">>".to_string(), b.to_string())));
+            return Ok((
+                c,
+                format!("{} {} {}", a.to_string(), ">>".to_string(), b.to_string()),
+            ));
         } else {
             return Err(EvaluatorError::OverflowShift(_position));
         }
@@ -63,10 +75,12 @@ pub mod functions {
         let a = args.pop().unwrap();
 
         if let Some(c) = a.checked_shl(b as u32) {
-            return Ok((c, format!("{} {} {}", a.to_string(), "<<".to_string(), b.to_string())));
+            return Ok((
+                c,
+                format!("{} {} {}", a.to_string(), "<<".to_string(), b.to_string()),
+            ));
         } else {
             return Err(EvaluatorError::OverflowShift(_position));
         }
-
     }
 }

@@ -1,9 +1,8 @@
 use lexer::{Symbol, Token, Tokens};
-use function::{Function, Functions, functions};
+use function::{functions, Function, Functions};
 use error::EvaluatorError;
-use constants::{VERSION, KEYWORDS, HELP, LICENSE};
+use constants::{HELP, KEYWORDS, LICENSE, VERSION};
 use std::u32;
-
 
 pub struct Evaluator {
     functions: Functions,
@@ -21,7 +20,9 @@ fn is_keyword(variable: &String) -> Option<&str> {
 
 impl Evaluator {
     pub fn new() -> Evaluator {
-        Evaluator { functions: Functions::new() }
+        Evaluator {
+            functions: Functions::new(),
+        }
     }
 
     pub fn evaluate(&self, tokens: Tokens) -> Result<Vec<String>, EvaluatorError> {
@@ -71,7 +72,6 @@ impl Evaluator {
                     result.push(interm_result.0.to_string());
                 }
                 _ => unreachable!(),
-
             }
         }
 
@@ -90,14 +90,30 @@ impl Default for Evaluator {
     fn default() -> Evaluator {
         let mut evaluator = Evaluator::new();
 
-        evaluator.functions.insert(Symbol::NOT, Function::new(1, Box::new(functions::not)));
-        evaluator.functions.insert(Symbol::XOR, Function::new(2, Box::new(functions::xor)));
-        evaluator.functions.insert(Symbol::OR, Function::new(2, Box::new(functions::or)));
-        evaluator.functions.insert(Symbol::AND, Function::new(2, Box::new(functions::and)));
-        evaluator.functions.insert(Symbol::LSHIFT,
-                                   Function::new(2, Box::new(functions::lshift)));
-        evaluator.functions.insert(Symbol::RSHIFT,
-                                   Function::new(2, Box::new(functions::rshift)));
+        evaluator.functions.insert(
+            Symbol::NOT,
+            Function::new(1, Box::new(functions::not))
+        );
+        evaluator.functions.insert(
+            Symbol::XOR,
+            Function::new(2, Box::new(functions::xor))
+        );
+        evaluator.functions.insert(
+            Symbol::OR,
+            Function::new(2, Box::new(functions::or))
+        );
+        evaluator.functions.insert(
+            Symbol::AND,
+            Function::new(2, Box::new(functions::and))
+        );
+        evaluator.functions.insert(
+            Symbol::LSHIFT,
+            Function::new(2, Box::new(functions::lshift))
+        );
+        evaluator.functions.insert(
+            Symbol::RSHIFT,
+            Function::new(2, Box::new(functions::rshift))
+        );
 
         evaluator
     }
@@ -111,7 +127,7 @@ mod tests {
     use constants::{HELP, LICENSE};
 
     #[test]
-    fn blank(){
+    fn blank() {
         let evaluator = Evaluator::default();
         let tokens: Tokens = vec![];
         let result: Vec<String> = vec![];
@@ -119,7 +135,7 @@ mod tests {
     }
 
     #[test]
-    fn decimal(){
+    fn decimal() {
         let evaluator = Evaluator::default();
         let tokens: Tokens = vec![(0, Token::Decimal("12".to_string()))];
         let result: Vec<String> = vec!["12".to_string()];
@@ -127,7 +143,7 @@ mod tests {
     }
 
     #[test]
-    fn hexadecimal(){
+    fn hexadecimal() {
         let evaluator = Evaluator::default();
         let tokens: Tokens = vec![(0, Token::Hexadecimal("0xc".to_string()))];
         let result: Vec<String> = vec!["12".to_string()];
@@ -135,14 +151,14 @@ mod tests {
     }
 
     #[test]
-    fn keyword_exit(){
+    fn keyword_exit() {
         let evaluator = Evaluator::default();
         let tokens: Tokens = vec![(0, Token::Keyword("exit".to_string()))];
         assert_eq!(evaluator.evaluate(tokens), Err(EvaluatorError::Exit));
     }
 
     #[test]
-    fn keyword_license(){
+    fn keyword_license() {
         let evaluator = Evaluator::default();
         let tokens: Tokens = vec![(0, Token::Keyword("license".to_string()))];
         let result: Vec<String> = LICENSE.lines().map(|line| line.to_string()).collect();
@@ -150,7 +166,7 @@ mod tests {
     }
 
     #[test]
-    fn keyword_help(){
+    fn keyword_help() {
         let evaluator = Evaluator::default();
         let tokens: Tokens = vec![(0, Token::Keyword("help".to_string()))];
         let result: Vec<String> = HELP.lines().map(|line| line.to_string()).collect();
@@ -158,7 +174,7 @@ mod tests {
     }
 
     #[test]
-    fn keyword_version(){
+    fn keyword_version() {
         let evaluator = Evaluator::default();
         let tokens: Tokens = vec![(0, Token::Keyword("version".to_string()))];
         let result: Vec<String> = vec![env!("CARGO_PKG_VERSION").to_string()];
@@ -166,130 +182,162 @@ mod tests {
     }
 
     #[test]
-    fn keyword_unknown(){
+    fn keyword_unknown() {
         let evaluator = Evaluator::default();
         let tokens: Tokens = vec![(0, Token::Keyword("rust".to_string()))];
-        assert_eq!(evaluator.evaluate(tokens), Err(EvaluatorError::UnknownKeyword(0)));
+        assert_eq!(
+            evaluator.evaluate(tokens),
+            Err(EvaluatorError::UnknownKeyword(0))
+        );
     }
 
     #[test]
-    fn expression_hexadecimal(){
+    fn expression_hexadecimal() {
         let evaluator = Evaluator::default();
-        let tokens: Tokens = vec![(0, Token::Hexadecimal("0x1".to_string())),
-                                  (4, Token::Hexadecimal("0xc".to_string())),
-                                  (2, Token::Operator(Symbol::LSHIFT))];
-        let result: Vec<String> = vec!["1 << 12".to_string(),
-                                       "4096".to_string()];
+        let tokens: Tokens = vec![
+            (0, Token::Hexadecimal("0x1".to_string())),
+            (4, Token::Hexadecimal("0xc".to_string())),
+            (2, Token::Operator(Symbol::LSHIFT)),
+        ];
+        let result: Vec<String> = vec!["1 << 12".to_string(), "4096".to_string()];
         assert_eq!(evaluator.evaluate(tokens).unwrap(), result);
     }
 
     #[test]
-    fn expression_decimal_lshift(){
+    fn expression_decimal_lshift() {
         let evaluator = Evaluator::default();
-        let tokens: Tokens = vec![(0, Token::Decimal("1".to_string())),
-                                  (4, Token::Decimal("12".to_string())),
-                                  (2, Token::Operator(Symbol::LSHIFT))];
-        let result: Vec<String> = vec!["1 << 12".to_string(),
-                                       "4096".to_string()];
+        let tokens: Tokens = vec![
+            (0, Token::Decimal("1".to_string())),
+            (4, Token::Decimal("12".to_string())),
+            (2, Token::Operator(Symbol::LSHIFT)),
+        ];
+        let result: Vec<String> = vec!["1 << 12".to_string(), "4096".to_string()];
         assert_eq!(evaluator.evaluate(tokens).unwrap(), result);
     }
 
     #[test]
-    fn expression_decimal_lshift_overflow(){
+    fn expression_decimal_lshift_overflow() {
         let evaluator = Evaluator::default();
-        let tokens: Tokens = vec![(0, Token::Decimal("4294967295".to_string())),
-                                  (14, Token::Decimal("32".to_string())),
-                                  (11, Token::Operator(Symbol::LSHIFT))];
-        assert_eq!(evaluator.evaluate(tokens), Err(EvaluatorError::OverflowShift(11)));
+        let tokens: Tokens = vec![
+            (0, Token::Decimal("4294967295".to_string())),
+            (14, Token::Decimal("32".to_string())),
+            (11, Token::Operator(Symbol::LSHIFT)),
+        ];
+        assert_eq!(
+            evaluator.evaluate(tokens),
+            Err(EvaluatorError::OverflowShift(11))
+        );
     }
 
     #[test]
-    fn expression_decimal_rshift(){
+    fn expression_decimal_rshift() {
         let evaluator = Evaluator::default();
-        let tokens: Tokens = vec![(0, Token::Decimal("12".to_string())),
-                                  (4, Token::Decimal("1".to_string())),
-                                  (2, Token::Operator(Symbol::RSHIFT))];
-        let result: Vec<String> = vec!["12 >> 1".to_string(),
-                                       "6".to_string()];
+        let tokens: Tokens = vec![
+            (0, Token::Decimal("12".to_string())),
+            (4, Token::Decimal("1".to_string())),
+            (2, Token::Operator(Symbol::RSHIFT)),
+        ];
+        let result: Vec<String> = vec!["12 >> 1".to_string(), "6".to_string()];
         assert_eq!(evaluator.evaluate(tokens).unwrap(), result);
     }
 
     #[test]
-    fn expression_decimal_rshift_overflow(){
+    fn expression_decimal_rshift_overflow() {
         let evaluator = Evaluator::default();
-        let tokens: Tokens = vec![(0, Token::Decimal("1".to_string())),
-                                  (4, Token::Decimal("32".to_string())),
-                                  (2, Token::Operator(Symbol::RSHIFT))];
-        assert_eq!(evaluator.evaluate(tokens), Err(EvaluatorError::OverflowShift(2)));
+        let tokens: Tokens = vec![
+            (0, Token::Decimal("1".to_string())),
+            (4, Token::Decimal("32".to_string())),
+            (2, Token::Operator(Symbol::RSHIFT)),
+        ];
+        assert_eq!(
+            evaluator.evaluate(tokens),
+            Err(EvaluatorError::OverflowShift(2))
+        );
     }
 
     #[test]
-    fn expression_decimal_xor(){
+    fn expression_decimal_xor() {
         let evaluator = Evaluator::default();
-        let tokens: Tokens = vec![(0, Token::Decimal("1".to_string())),
-                                  (4, Token::Decimal("12".to_string())),
-                                  (2, Token::Operator(Symbol::XOR))];
-        let result: Vec<String> = vec!["1 ^ 12".to_string(),
-                                       "13".to_string()];
+        let tokens: Tokens = vec![
+            (0, Token::Decimal("1".to_string())),
+            (4, Token::Decimal("12".to_string())),
+            (2, Token::Operator(Symbol::XOR)),
+        ];
+        let result: Vec<String> = vec!["1 ^ 12".to_string(), "13".to_string()];
         assert_eq!(evaluator.evaluate(tokens).unwrap(), result);
     }
 
     #[test]
-    fn expression_decimal_and(){
+    fn expression_decimal_and() {
         let evaluator = Evaluator::default();
-        let tokens: Tokens = vec![(0, Token::Decimal("1".to_string())),
-                                  (4, Token::Decimal("12".to_string())),
-                                  (2, Token::Operator(Symbol::AND))];
-        let result: Vec<String> = vec!["1 & 12".to_string(),
-                                       "0".to_string()];
+        let tokens: Tokens = vec![
+            (0, Token::Decimal("1".to_string())),
+            (4, Token::Decimal("12".to_string())),
+            (2, Token::Operator(Symbol::AND)),
+        ];
+        let result: Vec<String> = vec!["1 & 12".to_string(), "0".to_string()];
         assert_eq!(evaluator.evaluate(tokens).unwrap(), result);
     }
 
     #[test]
-    fn expression_decimal_or(){
+    fn expression_decimal_or() {
         let evaluator = Evaluator::default();
-        let tokens: Tokens = vec![(0, Token::Decimal("32".to_string())),
-                                  (5, Token::Decimal("10".to_string())),
-                                  (3, Token::Operator(Symbol::OR))];
-        let result: Vec<String> = vec!["32 | 10".to_string(),
-                                       "42".to_string()];
+        let tokens: Tokens = vec![
+            (0, Token::Decimal("32".to_string())),
+            (5, Token::Decimal("10".to_string())),
+            (3, Token::Operator(Symbol::OR)),
+        ];
+        let result: Vec<String> = vec!["32 | 10".to_string(), "42".to_string()];
         assert_eq!(evaluator.evaluate(tokens).unwrap(), result);
     }
 
     #[test]
-    fn expression_decimal_not(){
+    fn expression_decimal_not() {
         let evaluator = Evaluator::default();
-        let tokens: Tokens = vec![(1, Token::Decimal("12".to_string())),
-                                  (0, Token::Operator(Symbol::NOT))];
-        let result: Vec<String> = vec!["~12".to_string(),
-                                       "4294967283".to_string()];
+        let tokens: Tokens = vec![
+            (1, Token::Decimal("12".to_string())),
+            (0, Token::Operator(Symbol::NOT)),
+        ];
+        let result: Vec<String> = vec!["~12".to_string(), "4294967283".to_string()];
         assert_eq!(evaluator.evaluate(tokens).unwrap(), result);
     }
 
     #[test]
-    fn expression_missing_argument(){
+    fn expression_missing_argument() {
         let evaluator = Evaluator::default();
-        let tokens: Tokens = vec![(0, Token::Decimal("1".to_string())),
-                                  (2, Token::Operator(Symbol::AND))];
-        assert_eq!(evaluator.evaluate(tokens), Err(EvaluatorError::MissingArgument(2)));
+        let tokens: Tokens = vec![
+            (0, Token::Decimal("1".to_string())),
+            (2, Token::Operator(Symbol::AND)),
+        ];
+        assert_eq!(
+            evaluator.evaluate(tokens),
+            Err(EvaluatorError::MissingArgument(2))
+        );
     }
 
     #[test]
-    fn expression_missing_arguments(){
+    fn expression_missing_arguments() {
         let evaluator = Evaluator::default();
         let tokens: Tokens = vec![(0, Token::Operator(Symbol::AND))];
-        assert_eq!(evaluator.evaluate(tokens), Err(EvaluatorError::MissingArgument(0)));
+        assert_eq!(
+            evaluator.evaluate(tokens),
+            Err(EvaluatorError::MissingArgument(0))
+        );
     }
 
-
     #[test]
-    fn expression_too_many_arguments(){
+    fn expression_too_many_arguments() {
         let evaluator = Evaluator::default();
-        let tokens: Tokens = vec![(0, Token::Decimal("1".to_string())),
-                                  (6, Token::Decimal("12".to_string())),
-                                  (11, Token::Hexadecimal("0xf".to_string())),
-                                  (8, Token::Operator(Symbol::LSHIFT))];
-        assert_eq!(evaluator.evaluate(tokens), Err(EvaluatorError::TooManyArguments));
+        let tokens: Tokens = vec![
+            (0, Token::Decimal("1".to_string())),
+            (6, Token::Decimal("12".to_string())),
+            (11, Token::Hexadecimal("0xf".to_string())),
+            (8, Token::Operator(Symbol::LSHIFT)),
+        ];
+        assert_eq!(
+            evaluator.evaluate(tokens),
+            Err(EvaluatorError::TooManyArguments)
+        );
     }
 
 }

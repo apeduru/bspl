@@ -25,7 +25,9 @@ pub struct Parser {
 
 impl Parser {
     fn new() -> Parser {
-        Parser { operators: Operators::new() }
+        Parser {
+            operators: Operators::new(),
+        }
     }
 
     fn lower_precedence(&self, new_token: &Token, top_token: &Token) -> bool {
@@ -39,8 +41,8 @@ impl Parser {
             _ => unreachable!(),
         };
 
-        (*new_token_assoc == Associativity::LeftToRight && new_token_prec > top_token_prec) ||
-        (*new_token_assoc == Associativity::RightToLeft && new_token_prec >= top_token_prec)
+        (*new_token_assoc == Associativity::LeftToRight && new_token_prec > top_token_prec)
+            || (*new_token_assoc == Associativity::RightToLeft && new_token_prec >= top_token_prec)
     }
 
     pub fn parse(&self, tokens: Tokens) -> Result<Tokens, ParserError> {
@@ -50,9 +52,8 @@ impl Parser {
         let mut token_iterator = tokens.iter().peekable();
         while let Some(&(position, ref token)) = token_iterator.next() {
             match *token {
-                Token::Decimal(_) |
-                Token::Hexadecimal(_) => output.push((position, token.clone())),
-                Token::Keyword(_) =>  {
+                Token::Decimal(_) | Token::Hexadecimal(_) => output.push((position, token.clone())),
+                Token::Keyword(_) => {
                     if tokens.len() > 1 {
                         return Err(ParserError::KeywordError(position));
                     }
@@ -78,18 +79,16 @@ impl Parser {
                 Token::OpenBracket => {
                     stack.push((position, token.clone()));
                 }
-                Token::CloseBracket => {
-                    loop {
-                        match stack.last() {
-                            Some(&(_, Token::OpenBracket)) => {
-                                stack.pop();
-                                break;
-                            }
-                            Some(_) => output.push(stack.pop().unwrap()),
-                            None => return Err(ParserError::MissingOpeningBracket(position)),
+                Token::CloseBracket => loop {
+                    match stack.last() {
+                        Some(&(_, Token::OpenBracket)) => {
+                            stack.pop();
+                            break;
                         }
+                        Some(_) => output.push(stack.pop().unwrap()),
+                        None => return Err(ParserError::MissingOpeningBracket(position)),
                     }
-                }
+                },
             }
         }
         loop {
@@ -110,12 +109,30 @@ impl Default for Parser {
     fn default() -> Parser {
         let mut parser = Parser::new();
 
-        parser.operators.insert(Symbol::NOT, Operator::new(2, Associativity::RightToLeft));
-        parser.operators.insert(Symbol::RSHIFT, Operator::new(3, Associativity::LeftToRight));
-        parser.operators.insert(Symbol::LSHIFT, Operator::new(3, Associativity::LeftToRight));
-        parser.operators.insert(Symbol::AND, Operator::new(4, Associativity::LeftToRight));
-        parser.operators.insert(Symbol::XOR, Operator::new(5, Associativity::LeftToRight));
-        parser.operators.insert(Symbol::OR, Operator::new(6, Associativity::LeftToRight));
+        parser.operators.insert(
+            Symbol::NOT,
+            Operator::new(2, Associativity::RightToLeft)
+        );
+        parser.operators.insert(
+            Symbol::RSHIFT,
+            Operator::new(3, Associativity::LeftToRight)
+        );
+        parser.operators.insert(
+            Symbol::LSHIFT,
+            Operator::new(3, Associativity::LeftToRight)
+        );
+        parser.operators.insert(
+            Symbol::AND,
+            Operator::new(4, Associativity::LeftToRight)
+        );
+        parser.operators.insert(
+            Symbol::XOR,
+            Operator::new(5, Associativity::LeftToRight)
+        );
+        parser.operators.insert(
+            Symbol::OR,
+            Operator::new(6, Associativity::LeftToRight)
+        );
 
         parser
     }
@@ -128,7 +145,7 @@ mod tests {
     use error::ParserError;
 
     #[test]
-    fn blank(){
+    fn blank() {
         let parser = Parser::default();
         let tokens: Tokens = vec![];
         let parsed: Tokens = vec![];
@@ -136,75 +153,91 @@ mod tests {
     }
 
     #[test]
-    fn expression_valid_decimal(){
+    fn expression_valid_decimal() {
         let parser = Parser::default();
-        let tokens: Tokens = vec![(0, Token::Decimal("12".to_string())),
-                                  (3, Token::Operator(Symbol::OR)),
-                                  (5, Token::OpenBracket),
-                                  (6, Token::Decimal("1".to_string())),
-                                  (8, Token::Operator(Symbol::LSHIFT)),
-                                  (11, Token::Decimal("12".to_string())),
-                                  (13, Token::CloseBracket)];
-        let parsed: Tokens = vec![(0, Token::Decimal("12".to_string())),
-                                  (6, Token::Decimal("1".to_string())),
-                                  (11, Token::Decimal("12".to_string())),
-                                  (8, Token::Operator(Symbol::LSHIFT)),
-                                  (3, Token::Operator(Symbol::OR))];
+        let tokens: Tokens = vec![
+            (0, Token::Decimal("12".to_string())),
+            (3, Token::Operator(Symbol::OR)),
+            (5, Token::OpenBracket),
+            (6, Token::Decimal("1".to_string())),
+            (8, Token::Operator(Symbol::LSHIFT)),
+            (11, Token::Decimal("12".to_string())),
+            (13, Token::CloseBracket),
+        ];
+        let parsed: Tokens = vec![
+            (0, Token::Decimal("12".to_string())),
+            (6, Token::Decimal("1".to_string())),
+            (11, Token::Decimal("12".to_string())),
+            (8, Token::Operator(Symbol::LSHIFT)),
+            (3, Token::Operator(Symbol::OR)),
+        ];
         assert_eq!(parser.parse(tokens).unwrap(), parsed);
     }
 
     #[test]
-    fn expression_valid_decimal_precedence(){
+    fn expression_valid_decimal_precedence() {
         let parser = Parser::default();
-        let tokens: Tokens = vec![(0, Token::Decimal("12".to_string())),
-                                  (3, Token::Operator(Symbol::XOR)),
-                                  (6, Token::Decimal("3".to_string())),
-                                  (8, Token::Operator(Symbol::OR)),
-                                  (11, Token::Decimal("3".to_string()))];
+        let tokens: Tokens = vec![
+            (0, Token::Decimal("12".to_string())),
+            (3, Token::Operator(Symbol::XOR)),
+            (6, Token::Decimal("3".to_string())),
+            (8, Token::Operator(Symbol::OR)),
+            (11, Token::Decimal("3".to_string())),
+        ];
 
-        let parsed: Tokens = vec![(0, Token::Decimal("12".to_string())),
-                                  (6, Token::Decimal("3".to_string())),
-                                  (3, Token::Operator(Symbol::XOR)),
-                                  (11, Token::Decimal("3".to_string())),
-                                  (8, Token::Operator(Symbol::OR))];
+        let parsed: Tokens = vec![
+            (0, Token::Decimal("12".to_string())),
+            (6, Token::Decimal("3".to_string())),
+            (3, Token::Operator(Symbol::XOR)),
+            (11, Token::Decimal("3".to_string())),
+            (8, Token::Operator(Symbol::OR)),
+        ];
 
         assert_eq!(parser.parse(tokens).unwrap(), parsed);
     }
 
     #[test]
-    fn expression_valid_hexadecimal(){
+    fn expression_valid_hexadecimal() {
         let parser = Parser::default();
-        let tokens: Tokens = vec![(0, Token::Hexadecimal("0xc".to_string())),
-                                  (3, Token::Operator(Symbol::OR)),
-                                  (5, Token::OpenBracket),
-                                  (6, Token::Hexadecimal("0x1".to_string())),
-                                  (8, Token::Operator(Symbol::LSHIFT)),
-                                  (11, Token::Hexadecimal("0xc".to_string())),
-                                  (13, Token::CloseBracket)];
-        let parsed: Tokens = vec![(0, Token::Hexadecimal("0xc".to_string())),
-                                  (6, Token::Hexadecimal("0x1".to_string())),
-                                  (11, Token::Hexadecimal("0xc".to_string())),
-                                  (8, Token::Operator(Symbol::LSHIFT)),
-                                  (3, Token::Operator(Symbol::OR))];
+        let tokens: Tokens = vec![
+            (0, Token::Hexadecimal("0xc".to_string())),
+            (3, Token::Operator(Symbol::OR)),
+            (5, Token::OpenBracket),
+            (6, Token::Hexadecimal("0x1".to_string())),
+            (8, Token::Operator(Symbol::LSHIFT)),
+            (11, Token::Hexadecimal("0xc".to_string())),
+            (13, Token::CloseBracket),
+        ];
+        let parsed: Tokens = vec![
+            (0, Token::Hexadecimal("0xc".to_string())),
+            (6, Token::Hexadecimal("0x1".to_string())),
+            (11, Token::Hexadecimal("0xc".to_string())),
+            (8, Token::Operator(Symbol::LSHIFT)),
+            (3, Token::Operator(Symbol::OR)),
+        ];
         assert_eq!(parser.parse(tokens).unwrap(), parsed);
     }
 
     #[test]
-    fn expression_too_many_arguments(){
+    fn expression_too_many_arguments() {
         let parser = Parser::default();
-        let tokens: Tokens = vec![(0, Token::Decimal("1".to_string())),
-                                  (8, Token::Operator(Symbol::LSHIFT)),
-                                  (6, Token::Decimal("12".to_string())),
-                                  (11, Token::Hexadecimal("0xf".to_string()))];
-        let parsed: Tokens = vec![(0, Token::Decimal("1".to_string())),
-                                  (6, Token::Decimal("12".to_string())),
-                                  (11, Token::Hexadecimal("0xf".to_string())),
-                                  (8, Token::Operator(Symbol::LSHIFT))];
+        let tokens: Tokens = vec![
+            (0, Token::Decimal("1".to_string())),
+            (8, Token::Operator(Symbol::LSHIFT)),
+            (6, Token::Decimal("12".to_string())),
+            (11, Token::Hexadecimal("0xf".to_string())),
+        ];
+        let parsed: Tokens = vec![
+            (0, Token::Decimal("1".to_string())),
+            (6, Token::Decimal("12".to_string())),
+            (11, Token::Hexadecimal("0xf".to_string())),
+            (8, Token::Operator(Symbol::LSHIFT)),
+        ];
         assert_eq!(parser.parse(tokens).unwrap(), parsed);
     }
 
     #[test]
-    fn keyword_valid(){
+    fn keyword_valid() {
         let parser = Parser::default();
         let tokens: Tokens = vec![(0, Token::Keyword("exit".to_string()))];
         let parsed: Tokens = vec![(0, Token::Keyword("exit".to_string()))];
@@ -212,43 +245,57 @@ mod tests {
     }
 
     #[test]
-    fn expression_missing_open_bracket(){
+    fn expression_missing_open_bracket() {
         let parser = Parser::default();
-        let tokens: Tokens = vec![(0, Token::Decimal("12".to_string())),
-                                  (3, Token::Operator(Symbol::OR)),
-                                  (6, Token::Decimal("1".to_string())),
-                                  (8, Token::Operator(Symbol::LSHIFT)),
-                                  (11, Token::Decimal("12".to_string())),
-                                  (13, Token::CloseBracket)];
-        assert_eq!(parser.parse(tokens), Err(ParserError::MissingOpeningBracket(13)));
+        let tokens: Tokens = vec![
+            (0, Token::Decimal("12".to_string())),
+            (3, Token::Operator(Symbol::OR)),
+            (6, Token::Decimal("1".to_string())),
+            (8, Token::Operator(Symbol::LSHIFT)),
+            (11, Token::Decimal("12".to_string())),
+            (13, Token::CloseBracket),
+        ];
+        assert_eq!(
+            parser.parse(tokens),
+            Err(ParserError::MissingOpeningBracket(13))
+        );
     }
 
     #[test]
-    fn expression_missing_close_bracket(){
+    fn expression_missing_close_bracket() {
         let parser = Parser::default();
-        let tokens: Tokens = vec![(0, Token::Decimal("12".to_string())),
-                                  (3, Token::Operator(Symbol::OR)),
-                                  (5, Token::OpenBracket),
-                                  (6, Token::Decimal("1".to_string())),
-                                  (8, Token::Operator(Symbol::LSHIFT)),
-                                  (11, Token::Decimal("12".to_string()))];
-        assert_eq!(parser.parse(tokens), Err(ParserError::MissingClosingBracket(5)));
+        let tokens: Tokens = vec![
+            (0, Token::Decimal("12".to_string())),
+            (3, Token::Operator(Symbol::OR)),
+            (5, Token::OpenBracket),
+            (6, Token::Decimal("1".to_string())),
+            (8, Token::Operator(Symbol::LSHIFT)),
+            (11, Token::Decimal("12".to_string())),
+        ];
+        assert_eq!(
+            parser.parse(tokens),
+            Err(ParserError::MissingClosingBracket(5))
+        );
     }
 
     #[test]
-    fn keyword_too_many(){
+    fn keyword_too_many() {
         let parser = Parser::default();
-        let tokens: Tokens = vec![(0, Token::Keyword("exit".to_string())),
-                                  (5, Token::Keyword("help".to_string()))];
+        let tokens: Tokens = vec![
+            (0, Token::Keyword("exit".to_string())),
+            (5, Token::Keyword("help".to_string())),
+        ];
         assert_eq!(parser.parse(tokens), Err(ParserError::KeywordError(0)));
     }
 
     #[test]
-    fn keyword_in_expression(){
+    fn keyword_in_expression() {
         let parser = Parser::default();
-        let tokens: Tokens = vec![(0, Token::Keyword("exit".to_string())),
-                                  (5, Token::Operator(Symbol::OR)),
-                                  (7, Token::Keyword("help".to_string()))];
+        let tokens: Tokens = vec![
+            (0, Token::Keyword("exit".to_string())),
+            (5, Token::Operator(Symbol::OR)),
+            (7, Token::Keyword("help".to_string())),
+        ];
         assert_eq!(parser.parse(tokens), Err(ParserError::KeywordError(0)));
     }
 
