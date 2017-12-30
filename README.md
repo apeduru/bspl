@@ -17,7 +17,17 @@ And the equivalent using the Python REPL.
 
 ## Installation
 
+### Cargo
+
+Requires the latest stable version of Rust.
+
 `cargo install bspl`
+
+### Debian
+
+There are `deb` packages available in the Releases.
+
+`dpkg -i bspl_x.x.x_amd64.deb`
 
 ## Usage
 
